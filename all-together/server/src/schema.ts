@@ -1,4 +1,4 @@
-import { boolean, integer, numeric, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { boolean, integer, numeric, pgEnum, pgTable, text, timestamp, unique, uuid } from 'drizzle-orm/pg-core';
 
 export const roleEnum = pgEnum('role', ['organizer','co-organizer','family-member','guest']);
 export const rsvpEnum = pgEnum('rsvp_status', ['yes','no','maybe','pending']);
@@ -15,15 +15,15 @@ export const users = pgTable('users', {
 
 export const userIdentities = pgTable('user_identities', {
   id: uuid('id').defaultRandom().primaryKey(),
-  userId: uuid('user_id').notNull().references(() => users.id),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   provider: authProviderEnum('provider').notNull(),
   providerSubject: text('provider_subject').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-});
+}, (table) => [unique().on(table.provider, table.providerSubject)]);
 
 export const sessions = pgTable('sessions', {
   id: uuid('id').defaultRandom().primaryKey(),
-  userId: uuid('user_id').notNull().references(() => users.id),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   tokenHash: text('token_hash').notNull().unique(),
   expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
   revokedAt: timestamp('revoked_at', { withTimezone: true }),
@@ -37,35 +37,39 @@ export const familyGroups = pgTable('family_groups', {
 
 export const familyMemberships = pgTable('family_memberships', {
   id: uuid('id').defaultRandom().primaryKey(),
-  familyGroupId: uuid('family_group_id').notNull().references(() => familyGroups.id),
-  userId: uuid('user_id').notNull().references(() => users.id),
+  familyGroupId: uuid('family_group_id').notNull().references(() => familyGroups.id, { onDelete: 'cascade' }),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   role: roleEnum('role').notNull(),
-});
+}, (table) => [unique().on(table.familyGroupId, table.userId)]);
 
 export const events = pgTable('events', {
   id: uuid('id').defaultRandom().primaryKey(),
-  familyGroupId: uuid('family_group_id').notNull().references(() => familyGroups.id),
+  familyGroupId: uuid('family_group_id').notNull().references(() => familyGroups.id, { onDelete: 'cascade' }),
   title: text('title').notNull(),
   type: text('type').notNull(),
   description: text('description').notNull().default(''),
   locationName: text('location_name').notNull(),
+  locationLat: numeric('location_lat', { precision: 9, scale: 6 }),
+  locationLng: numeric('location_lng', { precision: 9, scale: 6 }),
   startsAt: timestamp('starts_at', { withTimezone: true }).notNull(),
   endsAt: timestamp('ends_at', { withTimezone: true }).notNull(),
   isPrivate: boolean('is_private').notNull().default(true),
   inviteCode: text('invite_code').notNull().unique(),
+  createdByUserId: uuid('created_by_user_id').references(() => users.id),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 });
 
 export const eventMemberships = pgTable('event_memberships', {
   id: uuid('id').defaultRandom().primaryKey(),
-  eventId: uuid('event_id').notNull().references(() => events.id),
-  userId: uuid('user_id').notNull().references(() => users.id),
+  eventId: uuid('event_id').notNull().references(() => events.id, { onDelete: 'cascade' }),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   role: roleEnum('role').notNull(),
   joinedAt: timestamp('joined_at', { withTimezone: true }).defaultNow().notNull(),
-});
+}, (table) => [unique().on(table.eventId, table.userId)]);
 
 export const invitations = pgTable('invitations', {
   id: uuid('id').defaultRandom().primaryKey(),
-  eventId: uuid('event_id').notNull().references(() => events.id),
+  eventId: uuid('event_id').notNull().references(() => events.id, { onDelete: 'cascade' }),
   createdByUserId: uuid('created_by_user_id').notNull().references(() => users.id),
   code: text('code').notNull().unique(),
   email: text('email'),
@@ -79,7 +83,7 @@ export const invitations = pgTable('invitations', {
 
 export const households = pgTable('households', {
   id: uuid('id').defaultRandom().primaryKey(),
-  eventId: uuid('event_id').notNull().references(() => events.id),
+  eventId: uuid('event_id').notNull().references(() => events.id, { onDelete: 'cascade' }),
   managerUserId: uuid('manager_user_id').references(() => users.id),
   name: text('name').notNull(),
   rsvp: rsvpEnum('rsvp').notNull().default('pending'),
@@ -87,67 +91,121 @@ export const households = pgTable('households', {
 
 export const householdPeople = pgTable('household_people', {
   id: uuid('id').defaultRandom().primaryKey(),
-  householdId: uuid('household_id').notNull().references(() => households.id),
+  householdId: uuid('household_id').notNull().references(() => households.id, { onDelete: 'cascade' }),
   name: text('name').notNull(),
   linkedUserId: uuid('linked_user_id').references(() => users.id),
   ageGroup: text('age_group'),
+  attending: boolean('attending'),
 });
 
 export const scheduleItems = pgTable('schedule_items', {
   id: uuid('id').defaultRandom().primaryKey(),
-  eventId: uuid('event_id').notNull().references(() => events.id),
+  eventId: uuid('event_id').notNull().references(() => events.id, { onDelete: 'cascade' }),
   title: text('title').notNull(),
   locationName: text('location_name').notNull(),
+  locationLat: numeric('location_lat', { precision: 9, scale: 6 }),
+  locationLng: numeric('location_lng', { precision: 9, scale: 6 }),
   startsAt: timestamp('starts_at', { withTimezone: true }).notNull(),
+  endsAt: timestamp('ends_at', { withTimezone: true }),
   notes: text('notes'),
   optionalRsvp: boolean('optional_rsvp').notNull().default(false),
 });
 
+export const activityRsvps = pgTable('activity_rsvps', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  scheduleItemId: uuid('schedule_item_id').notNull().references(() => scheduleItems.id, { onDelete: 'cascade' }),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  status: rsvpEnum('status').notNull().default('pending'),
+}, (table) => [unique().on(table.scheduleItemId, table.userId)]);
+
 export const polls = pgTable('polls', {
   id: uuid('id').defaultRandom().primaryKey(),
-  eventId: uuid('event_id').notNull().references(() => events.id),
+  eventId: uuid('event_id').notNull().references(() => events.id, { onDelete: 'cascade' }),
   question: text('question').notNull(),
   mode: pollModeEnum('mode').notNull(),
   closesAt: timestamp('closes_at', { withTimezone: true }),
+  createdByUserId: uuid('created_by_user_id').references(() => users.id),
 });
 
 export const pollOptions = pgTable('poll_options', {
   id: uuid('id').defaultRandom().primaryKey(),
-  pollId: uuid('poll_id').notNull().references(() => polls.id),
+  pollId: uuid('poll_id').notNull().references(() => polls.id, { onDelete: 'cascade' }),
   label: text('label').notNull(),
 });
 
+export const pollVotes = pgTable('poll_votes', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  pollId: uuid('poll_id').notNull().references(() => polls.id, { onDelete: 'cascade' }),
+  optionId: uuid('option_id').notNull().references(() => pollOptions.id, { onDelete: 'cascade' }),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => [unique().on(table.optionId, table.userId)]);
+
 export const expenses = pgTable('expenses', {
   id: uuid('id').defaultRandom().primaryKey(),
-  eventId: uuid('event_id').notNull().references(() => events.id),
+  eventId: uuid('event_id').notNull().references(() => events.id, { onDelete: 'cascade' }),
   title: text('title').notNull(),
   payerUserId: uuid('payer_user_id').references(() => users.id),
   amount: numeric('amount', { precision: 10, scale: 2 }).notNull(),
   splitMode: splitModeEnum('split_mode').notNull(),
   settled: boolean('settled').notNull().default(false),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 });
+
+export const expenseShares = pgTable('expense_shares', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  expenseId: uuid('expense_id').notNull().references(() => expenses.id, { onDelete: 'cascade' }),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  amount: numeric('amount', { precision: 10, scale: 2 }).notNull(),
+  settled: boolean('settled').notNull().default(false),
+}, (table) => [unique().on(table.expenseId, table.userId)]);
 
 export const tasks = pgTable('tasks', {
   id: uuid('id').defaultRandom().primaryKey(),
-  eventId: uuid('event_id').notNull().references(() => events.id),
+  eventId: uuid('event_id').notNull().references(() => events.id, { onDelete: 'cascade' }),
   title: text('title').notNull(),
   assigneeUserId: uuid('assignee_user_id').references(() => users.id),
   dueAt: timestamp('due_at', { withTimezone: true }),
   complete: boolean('complete').notNull().default(false),
+  createdByUserId: uuid('created_by_user_id').references(() => users.id),
 });
 
 export const messages = pgTable('messages', {
   id: uuid('id').defaultRandom().primaryKey(),
-  eventId: uuid('event_id').notNull().references(() => events.id),
+  eventId: uuid('event_id').notNull().references(() => events.id, { onDelete: 'cascade' }),
   senderUserId: uuid('sender_user_id').notNull().references(() => users.id),
   body: text('body').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  removedAt: timestamp('removed_at', { withTimezone: true }),
 });
 
 export const photos = pgTable('photos', {
   id: uuid('id').defaultRandom().primaryKey(),
-  eventId: uuid('event_id').notNull().references(() => events.id),
+  eventId: uuid('event_id').notNull().references(() => events.id, { onDelete: 'cascade' }),
   uploaderUserId: uuid('uploader_user_id').notNull().references(() => users.id),
   cloudinaryPublicId: text('cloudinary_public_id').notNull(),
+  secureUrl: text('secure_url'),
   caption: text('caption'),
+  removedAt: timestamp('removed_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const pushTokens = pgTable('push_tokens', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  token: text('token').notNull().unique(),
+  platform: text('platform').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const notifications = pgTable('notifications', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  eventId: uuid('event_id').references(() => events.id, { onDelete: 'cascade' }),
+  type: text('type').notNull(),
+  title: text('title').notNull(),
+  body: text('body').notNull(),
+  readAt: timestamp('read_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 });
