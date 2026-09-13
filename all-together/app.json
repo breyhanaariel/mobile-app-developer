@@ -3,7 +3,7 @@
     "name": "AllTogether",
     "slug": "all-together",
     "scheme": "alltogether",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "ios": {
@@ -16,6 +16,6 @@
         "backgroundColor": "#FFF7E8"
       }
     },
-    "plugins": ["expo-image-picker", "expo-notifications"]
+    "plugins": ["expo-image-picker", "expo-notifications", "expo-secure-store", "@clerk/expo"]
   }
 }
