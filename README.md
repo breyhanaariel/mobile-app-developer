@@ -12,6 +12,17 @@ I design and build complete mobile applications—not just interfaces.
 
 The portfolio is primarily designed for freelance clients while retaining enough technical depth for employers and engineering reviewers. Each flagship project is an **Independent Concept Project based on a realistic client brief**. Concept projects are never presented as paid client work.
 
+## Repository Structure
+
+This portfolio uses a monorepo structure, matching my other specialty portfolios. The portfolio website lives at the repository root while each flagship app has its own project folder and README:
+
+- `glossed-tip/` — native Android mobile nail booking system
+- `all-together/` — React Native family event planning platform
+- `bite-route/` — Flutter food-truck ordering and loyalty app
+- `.github/workflows/` — app-specific CI/build workflows
+
+Each app remains independently buildable inside the shared `mobile-app-developer` repository.
+
 ## Flagship Projects
 
 ### 01 — Glossed Tip
@@ -115,7 +126,7 @@ Projects will be built one at a time and made genuinely functional before moving
 2. **AllTogether** — family event planning platform
 3. **Bite Route** — food truck ordering & loyalty app
 
-Each application will ultimately have public source code and a usable/demo-ready build where practical. The applications themselves will live in separate public repositories; this repository remains the portfolio website and case-study hub.
+Each application will ultimately have a usable/demo-ready build where practical while remaining inside this repository. GitHub Actions workflows are scoped per app so changes to one project can build that project independently.
 
 ## Planned Contact Options
 
