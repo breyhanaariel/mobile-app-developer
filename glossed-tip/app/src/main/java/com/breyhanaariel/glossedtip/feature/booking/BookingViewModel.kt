@@ -16,7 +16,22 @@ class BookingViewModel : ViewModel() {
 
     fun selectService(service: NailService) {
         val customization = draft.customization
-        draft = draft.copy(service = service, pricing = BookingEngine.calculatePricing(service, customization, draft.addressValidation))
+        draft = draft.copy(service = service, portfolioSet = null, pricing = BookingEngine.calculatePricing(service, customization, draft.addressValidation))
+    }
+
+    fun preconfigurePortfolioSet(set: PortfolioSet) {
+        val service = SampleData.services.firstOrNull { it.id == set.serviceId } ?: return
+        val length = NailLength.entries.firstOrNull { it.label.equals(set.length, ignoreCase = true) } ?: NailLength.SHORT
+        val shape = NailShape.entries.firstOrNull { it.label.equals(set.shape, ignoreCase = true) } ?: NailShape.SQUARE
+        val customization = ServiceCustomization(length = length, shape = shape, artLevel = set.artLevel)
+        draft = BookingDraft(
+            service = service,
+            portfolioSet = set,
+            customization = customization,
+            pricing = BookingEngine.calculatePricing(service, customization, null),
+            step = BookingStep.SERVICE,
+        )
+        availability = emptyList()
     }
 
     fun updateCustomization(customization: ServiceCustomization) {
