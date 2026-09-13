@@ -4,11 +4,29 @@ export const roleEnum = pgEnum('role', ['organizer','co-organizer','family-membe
 export const rsvpEnum = pgEnum('rsvp_status', ['yes','no','maybe','pending']);
 export const pollModeEnum = pgEnum('poll_mode', ['single','multiple']);
 export const splitModeEnum = pgEnum('split_mode', ['equal','selected','custom']);
+export const authProviderEnum = pgEnum('auth_provider', ['email','google','apple']);
 
 export const users = pgTable('users', {
   id: uuid('id').defaultRandom().primaryKey(),
   email: text('email').notNull().unique(),
   displayName: text('display_name').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const userIdentities = pgTable('user_identities', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id').notNull().references(() => users.id),
+  provider: authProviderEnum('provider').notNull(),
+  providerSubject: text('provider_subject').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const sessions = pgTable('sessions', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id').notNull().references(() => users.id),
+  tokenHash: text('token_hash').notNull().unique(),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  revokedAt: timestamp('revoked_at', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 });
 
@@ -35,6 +53,28 @@ export const events = pgTable('events', {
   endsAt: timestamp('ends_at', { withTimezone: true }).notNull(),
   isPrivate: boolean('is_private').notNull().default(true),
   inviteCode: text('invite_code').notNull().unique(),
+});
+
+export const eventMemberships = pgTable('event_memberships', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  eventId: uuid('event_id').notNull().references(() => events.id),
+  userId: uuid('user_id').notNull().references(() => users.id),
+  role: roleEnum('role').notNull(),
+  joinedAt: timestamp('joined_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const invitations = pgTable('invitations', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  eventId: uuid('event_id').notNull().references(() => events.id),
+  createdByUserId: uuid('created_by_user_id').notNull().references(() => users.id),
+  code: text('code').notNull().unique(),
+  email: text('email'),
+  role: roleEnum('role').notNull().default('family-member'),
+  expiresAt: timestamp('expires_at', { withTimezone: true }),
+  maxUses: integer('max_uses'),
+  useCount: integer('use_count').notNull().default(0),
+  revokedAt: timestamp('revoked_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 });
 
 export const households = pgTable('households', {
