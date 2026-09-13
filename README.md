@@ -2,9 +2,9 @@
 
 > Complete mobile app solutions for small businesses, entrepreneurs, and custom product ideas.
 
-**Portfolio status:** Foundation / projects in development
+**Portfolio status:** Two flagship demos complete / Bite Route planned
 
-This repository is the source for my freelance-first Mobile Application Developer portfolio. The portfolio is designed to demonstrate complete app delivery: product thinking, UI/UX, implementation, authentication, databases, notifications, payments and booking where appropriate, testing, and deployment.
+This repository is the source for my freelance-first Mobile Application Developer portfolio. The portfolio demonstrates complete app delivery: product thinking, UI/UX, implementation, authentication, databases, notifications, payments and booking where appropriate, testing, and deployment.
 
 ## Positioning
 
@@ -43,17 +43,19 @@ The technician receives a dedicated responsive web admin dashboard demo for dail
 ### 02 — AllTogether
 
 **Family event planning platform**  
-**Status:** Planned
+**Status:** Demo Complete / Live Neon Persistence / External Integrations Pending
 
 **Client scenario:** A family organizer wants one private place to coordinate reunions, birthdays, vacations, holidays, and other multi-generational family events instead of relying on group texts, spreadsheets, and scattered apps.
 
-AllTogether is event-centered rather than feed-centered. Planned features include event creation, household-based RSVPs, schedules, polls, responsibilities, shared expenses, invitations, family roles, chat, photos, reminders, and simple multi-generational UX.
+AllTogether is event-centered rather than feed-centered. The completed portfolio demo includes private event creation, household-based RSVPs, multi-day schedules, single/multiple-choice polls, tasks, shared expense tracking and settlement, invitations, family/event roles, one event-wide chat, photo-upload architecture, notifications, and accessible multi-generational UX.
 
-**Signature feature:** Household RSVP — one family member can manage attendance for their household without requiring every attendee to create an account.
+**Signature feature:** Household RSVP — one family member can manage attendance for an entire household, including children and guests who do not need accounts.
 
-**Technical focus:** iOS + Android • React Native • TypeScript • custom API/backend • PostgreSQL
+The backend uses a real seeded Neon PostgreSQL database with a Fastify/Drizzle API. Clerk, Cloudinary, Expo Push, secondary email, optional embedded Google Maps credentials, and the initial Vercel project import remain external account configuration and are never falsely represented as active before credentials are supplied.
 
-**Portfolio proof:** Cross-platform development, custom backend architecture, database design, authorization, real-time collaboration, accessibility, and complex multi-user product design.
+**Technical focus:** iOS + Android • Expo/React Native • TypeScript • Fastify • Neon PostgreSQL • Drizzle ORM • Clerk architecture • Cloudinary architecture • Expo Push • Google Maps handoff • CI/testing
+
+**Portfolio proof:** Cross-platform development, relational database design, role-based authorization, private invitations, multi-user collaboration, exact-cent expense logic, accessibility, media/notification integration architecture, automated tests, and native Android packaging.
 
 ### 03 — Bite Route
 
@@ -78,7 +80,7 @@ The three projects are intentionally different rather than variations of the sam
 - **AllTogether:** custom consumer product + collaboration + custom backend
 - **Bite Route:** commerce + location + orders + loyalty
 
-Across the portfolio, authentication patterns will be demonstrated where they naturally fit, including email/password, Google, Apple, phone/OTP, guest access, and device/biometric re-entry where appropriate. Authentication methods will not be artificially duplicated across every project.
+Across the portfolio, authentication patterns are demonstrated where they naturally fit, including email/password, Google, Apple, phone/OTP, guest access, and device/biometric re-entry where appropriate. Authentication methods are not artificially duplicated across every project.
 
 ## Freelance Services
 
@@ -112,21 +114,21 @@ The initial inquiry will stay intentionally short: app idea, desired platforms, 
 
 ## Case Study Standard
 
-Each completed project will document:
+Each completed project documents:
 
 **Client Brief → Problem → Product Solution → UX/UI → Architecture → Implementation → Features → Testing → Deployment → Results**
 
-Only real technical measurements and actual outcomes will be reported. No fictional business metrics, testimonials, clients, or performance claims will be invented.
+Only real technical measurements and actual outcomes are reported. No fictional business metrics, testimonials, clients, or performance claims are invented.
 
 ## Development Order
 
-Projects will be built one at a time and made genuinely functional before moving to the next:
+Projects are built one at a time and made genuinely functional before moving to the next:
 
-1. **Glossed Tip** — mobile nail technician booking system
-2. **AllTogether** — family event planning platform
-3. **Bite Route** — food truck ordering & loyalty app
+1. **Glossed Tip** — demo complete; live provider credentials/configuration pending
+2. **AllTogether** — demo complete; live Neon persistence; external provider configuration pending
+3. **Bite Route** — next flagship build
 
-Each application will ultimately have a usable/demo-ready build where practical while remaining inside this repository. GitHub Actions workflows are scoped per app so changes to one project can build that project independently.
+Each application remains inside this repository. GitHub Actions workflows are scoped per app so changes to one project can build that project independently.
 
 ## Planned Contact Options
 
