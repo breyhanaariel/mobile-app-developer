@@ -1,0 +1,21 @@
+{
+  "expo": {
+    "name": "AllTogether",
+    "slug": "all-together",
+    "scheme": "alltogether",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.breyhanaariel.alltogether"
+    },
+    "android": {
+      "package": "com.breyhanaariel.alltogether",
+      "adaptiveIcon": {
+        "backgroundColor": "#FFF7E8"
+      }
+    },
+    "plugins": ["expo-image-picker", "expo-notifications"]
+  }
+}
