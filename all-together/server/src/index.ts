@@ -1,112 +1,231 @@
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import { z } from 'zod';
-import { principalFromAuthorization, type EventRole } from './auth.js';
+import { principalFromAuthorization, roleCanManageEvent } from './auth.js';
+import { databaseEnabled } from './db.js';
+import {
+  acceptInvitation,
+  createEvent,
+  getEventBundle,
+  getMembership,
+  listNotifications,
+  listUserEvents,
+  postMessage,
+  previewInvitation,
+  setExpenseShareSettled,
+  setTaskComplete,
+  updateHouseholdRsvp,
+  votePoll,
+} from './repository.js';
 
 const app = Fastify({ logger: true });
 await app.register(cors, { origin: true });
 
-const householdRsvpSchema = z.object({ householdId: z.string().min(1), status: z.enum(['yes','no','maybe','pending']) });
-const messageSchema = z.object({ eventId: z.string().min(1), sender: z.string().min(1), text: z.string().min(1).max(2000) });
+const eventCreateSchema = z.object({
+  familyGroupId: z.string().uuid().optional(),
+  title: z.string().min(2).max(120),
+  type: z.enum(['Family Reunion','Birthday','Holiday','Vacation','Graduation','Celebration','Custom']),
+  description: z.string().max(2000).optional(),
+  locationName: z.string().min(2).max(200),
+  startsAt: z.coerce.date(),
+  endsAt: z.coerce.date(),
+});
+const householdRsvpSchema = z.object({
+  status: z.enum(['yes','no','maybe','pending']),
+  attendance: z.record(z.string().uuid(), z.boolean()).optional(),
+});
+const messageSchema = z.object({ eventId: z.string().uuid(), text: z.string().min(1).max(2000) });
+const voteSchema = z.object({ optionIds: z.array(z.string().uuid()).max(20) });
+const settledSchema = z.object({ settled: z.boolean() });
+const completeSchema = z.object({ complete: z.boolean() });
 
-const demoEvent = {
-  eventId: '22222222-2222-4222-8222-222222222222',
-  familyGroupId: '33333333-3333-4333-8333-333333333333',
-  eventTitle: 'The Carter Family Reunion 2027',
-  eventType: 'Family Reunion',
-  locationName: 'St. Petersburg, Florida',
-  startsAt: '2027-07-16T16:00:00-04:00',
-  endsAt: '2027-07-18T15:00:00-04:00',
-} as const;
+async function requirePrincipal(request: { headers: { authorization?: string } }, reply: any) {
+  const principal = await principalFromAuthorization(request.headers.authorization);
+  if (!principal) reply.code(401).send({ error: 'authentication_required' });
+  return principal;
+}
 
-const demoInvitations: Record<string, { role: EventRole }> = {
-  CARTER2027: { role: 'family-member' },
-  CARTERGUEST: { role: 'guest' },
-};
-
-app.get('/health', async () => ({ ok: true, service: 'all-together-api' }));
-
-app.get('/v1/auth/providers', async () => ({
-  providers: [
-    { id: 'email', enabled: true, mode: 'demo-boundary' },
-    { id: 'google', enabled: true, mode: 'credential-pending' },
-    { id: 'apple', enabled: true, mode: 'credential-pending' },
-  ],
+app.get('/health', async () => ({
+  ok: true,
+  service: 'all-together-api',
+  database: databaseEnabled ? 'configured' : 'missing',
+  clerk: process.env.CLERK_SECRET_KEY || process.env.CLERK_JWT_KEY ? 'configured' : 'demo-boundary',
+  cloudinary: process.env.CLOUDINARY_CLOUD_NAME ? 'configured' : 'credential-pending',
+  push: process.env.EXPO_ACCESS_TOKEN ? 'configured' : 'credential-pending',
+  email: process.env.RESEND_API_KEY ? 'configured' : 'credential-pending',
 }));
 
-app.get('/v1/events/:eventId', async (request) => {
+app.get('/v1/integrations/readiness', async () => ({
+  database: databaseEnabled,
+  clerk: Boolean(process.env.CLERK_SECRET_KEY || process.env.CLERK_JWT_KEY),
+  googleMaps: Boolean(process.env.GOOGLE_MAPS_API_KEY),
+  cloudinary: Boolean(process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET),
+  expoPush: Boolean(process.env.EXPO_ACCESS_TOKEN),
+  email: Boolean(process.env.RESEND_API_KEY),
+}));
+
+app.get('/v1/auth/providers', async () => ({
+  provider: 'clerk',
+  providers: [
+    { id: 'email', enabled: true },
+    { id: 'google', enabled: true },
+    { id: 'apple', enabled: true },
+  ],
+  credentialMode: process.env.CLERK_SECRET_KEY ? 'live' : 'demo-boundary',
+}));
+
+app.get('/v1/events', async (request, reply) => {
+  const principal = await requirePrincipal(request, reply);
+  if (!principal) return;
+  return { events: await listUserEvents(principal.userId) };
+});
+
+app.post('/v1/events', async (request, reply) => {
+  const principal = await requirePrincipal(request, reply);
+  if (!principal) return;
+  const parsed = eventCreateSchema.safeParse(request.body);
+  if (!parsed.success) return reply.code(400).send({ error: parsed.error.flatten() });
+  if (parsed.data.endsAt <= parsed.data.startsAt) return reply.code(400).send({ error: 'event_end_must_follow_start' });
+  const event = await createEvent({ userId: principal.userId, ...parsed.data });
+  return reply.code(201).send({ event });
+});
+
+app.get('/v1/events/:eventId', async (request, reply) => {
+  const principal = await requirePrincipal(request, reply);
+  if (!principal) return;
   const { eventId } = request.params as { eventId: string };
-  return { eventId, source: 'demo', message: 'Replace with Neon/Drizzle query once DATABASE_URL is configured.' };
+  const membership = await getMembership(eventId, principal.userId);
+  if (!membership) return reply.code(403).send({ error: 'event_membership_required' });
+  const bundle = await getEventBundle(eventId, principal.userId);
+  if (!bundle) return reply.code(404).send({ error: 'event_not_found' });
+  return bundle;
 });
 
 app.get('/v1/events/:eventId/me', async (request, reply) => {
-  const principal = principalFromAuthorization(request.headers.authorization);
-  if (!principal) return reply.code(401).send({ error: 'authentication_required' });
-
+  const principal = await requirePrincipal(request, reply);
+  if (!principal) return;
   const { eventId } = request.params as { eventId: string };
-  if (eventId !== demoEvent.eventId) return reply.code(404).send({ error: 'event_not_found' });
-
-  return {
-    user: principal,
-    eventId,
-    role: 'family-member' satisfies EventRole,
-    householdManager: true,
-  };
+  const membership = await getMembership(eventId, principal.userId);
+  if (!membership) return reply.code(404).send({ error: 'membership_not_found' });
+  const bundle = await getEventBundle(eventId, principal.userId);
+  return { user: principal, eventId, role: membership.role, householdManager: bundle?.membership?.householdManager ?? false };
 });
 
-app.post('/v1/households/rsvp', async (request, reply) => {
-  const principal = principalFromAuthorization(request.headers.authorization);
-  if (!principal) return reply.code(401).send({ error: 'authentication_required' });
-
+app.post('/v1/households/:householdId/rsvp', async (request, reply) => {
+  const principal = await requirePrincipal(request, reply);
+  if (!principal) return;
+  const { householdId } = request.params as { householdId: string };
   const parsed = householdRsvpSchema.safeParse(request.body);
   if (!parsed.success) return reply.code(400).send({ error: parsed.error.flatten() });
-  return { ok: true, updatedByUserId: principal.userId, ...parsed.data };
+  const result = await updateHouseholdRsvp(householdId, principal.userId, parsed.data.status, parsed.data.attendance);
+  if (result.kind === 'not_found') return reply.code(404).send({ error: 'household_not_found' });
+  if (result.kind === 'forbidden') return reply.code(403).send({ error: 'household_rsvp_not_allowed' });
+  return { ok: true };
 });
 
 app.post('/v1/chat/messages', async (request, reply) => {
-  const principal = principalFromAuthorization(request.headers.authorization);
-  if (!principal) return reply.code(401).send({ error: 'authentication_required' });
-
+  const principal = await requirePrincipal(request, reply);
+  if (!principal) return;
   const parsed = messageSchema.safeParse(request.body);
   if (!parsed.success) return reply.code(400).send({ error: parsed.error.flatten() });
-  return {
-    ok: true,
-    id: crypto.randomUUID(),
-    senderUserId: principal.userId,
-    createdAt: new Date().toISOString(),
-    ...parsed.data,
-  };
+  const result = await postMessage(parsed.data.eventId, principal.userId, parsed.data.text);
+  if (result.kind === 'forbidden') return reply.code(403).send({ error: 'event_membership_required' });
+  return reply.code(201).send(result.message);
 });
 
 app.get('/v1/invitations/:code/preview', async (request, reply) => {
   const { code } = request.params as { code: string };
-  const invitation = demoInvitations[code.toUpperCase()];
-  if (!invitation) return reply.code(404).send({ error: 'invitation_not_found' });
-
+  const row = await previewInvitation(code);
+  if (!row) return reply.code(404).send({ error: 'invitation_not_found' });
+  if (row.invitation.expiresAt && row.invitation.expiresAt < new Date()) return reply.code(410).send({ error: 'invitation_expired' });
   return {
-    code: code.toUpperCase(),
-    ...demoEvent,
-    private: true,
+    code: row.invitation.code,
+    eventId: row.event.id,
+    familyGroupId: row.event.familyGroupId,
+    eventTitle: row.event.title,
+    eventType: row.event.type,
+    locationName: row.event.locationName,
+    startsAt: row.event.startsAt,
+    endsAt: row.event.endsAt,
+    private: row.event.isPrivate,
     previewAllowed: true,
     participationRequiresAuthentication: true,
   };
 });
 
 app.post('/v1/invitations/:code/accept', async (request, reply) => {
-  const principal = principalFromAuthorization(request.headers.authorization);
-  if (!principal) return reply.code(401).send({ error: 'authentication_required' });
-
+  const principal = await requirePrincipal(request, reply);
+  if (!principal) return;
   const { code } = request.params as { code: string };
-  const invitation = demoInvitations[code.toUpperCase()];
-  if (!invitation) return reply.code(404).send({ error: 'invitation_not_found' });
+  const result = await acceptInvitation(code, principal.userId, principal.email);
+  if (result.kind === 'not_found') return reply.code(404).send({ error: 'invitation_not_found' });
+  if (result.kind === 'expired') return reply.code(410).send({ error: 'invitation_expired' });
+  if (result.kind === 'exhausted') return reply.code(409).send({ error: 'invitation_limit_reached' });
+  if (result.kind === 'email_mismatch') return reply.code(403).send({ error: 'invitation_email_mismatch' });
+  return { accepted: true, eventId: result.eventId, role: result.role };
+});
 
-  return {
-    accepted: true,
-    userId: principal.userId,
-    eventId: demoEvent.eventId,
-    familyGroupId: demoEvent.familyGroupId,
-    role: invitation.role,
-  };
+app.post('/v1/polls/:pollId/votes', async (request, reply) => {
+  const principal = await requirePrincipal(request, reply);
+  if (!principal) return;
+  const { pollId } = request.params as { pollId: string };
+  const parsed = voteSchema.safeParse(request.body);
+  if (!parsed.success) return reply.code(400).send({ error: parsed.error.flatten() });
+  const result = await votePoll(pollId, parsed.data.optionIds, principal.userId);
+  if (result.kind === 'not_found') return reply.code(404).send({ error: 'poll_not_found' });
+  if (result.kind === 'closed') return reply.code(409).send({ error: 'poll_closed' });
+  if (result.kind === 'forbidden') return reply.code(403).send({ error: 'event_membership_required' });
+  if (result.kind === 'invalid') return reply.code(400).send({ error: 'invalid_poll_vote' });
+  return { ok: true };
+});
+
+app.patch('/v1/expense-shares/:shareId', async (request, reply) => {
+  const principal = await requirePrincipal(request, reply);
+  if (!principal) return;
+  const { shareId } = request.params as { shareId: string };
+  const parsed = settledSchema.safeParse(request.body);
+  if (!parsed.success) return reply.code(400).send({ error: parsed.error.flatten() });
+  const result = await setExpenseShareSettled(shareId, principal.userId, parsed.data.settled);
+  if (result.kind === 'not_found') return reply.code(404).send({ error: 'expense_share_not_found' });
+  if (result.kind === 'forbidden') return reply.code(403).send({ error: 'expense_update_not_allowed' });
+  return { ok: true };
+});
+
+app.patch('/v1/tasks/:taskId', async (request, reply) => {
+  const principal = await requirePrincipal(request, reply);
+  if (!principal) return;
+  const { taskId } = request.params as { taskId: string };
+  const parsed = completeSchema.safeParse(request.body);
+  if (!parsed.success) return reply.code(400).send({ error: parsed.error.flatten() });
+  const result = await setTaskComplete(taskId, principal.userId, parsed.data.complete);
+  if (result.kind === 'not_found') return reply.code(404).send({ error: 'task_not_found' });
+  if (result.kind === 'forbidden') return reply.code(403).send({ error: 'task_update_not_allowed' });
+  return { ok: true };
+});
+
+app.get('/v1/notifications', async (request, reply) => {
+  const principal = await requirePrincipal(request, reply);
+  if (!principal) return;
+  return { notifications: await listNotifications(principal.userId) };
+});
+
+app.get('/v1/events/:eventId/changes', async (request, reply) => {
+  const principal = await requirePrincipal(request, reply);
+  if (!principal) return;
+  const { eventId } = request.params as { eventId: string };
+  const membership = await getMembership(eventId, principal.userId);
+  if (!membership) return reply.code(403).send({ error: 'event_membership_required' });
+  const bundle = await getEventBundle(eventId, principal.userId);
+  return { serverTime: new Date().toISOString(), event: bundle };
+});
+
+app.get('/v1/events/:eventId/admin', async (request, reply) => {
+  const principal = await requirePrincipal(request, reply);
+  if (!principal) return;
+  const { eventId } = request.params as { eventId: string };
+  const membership = await getMembership(eventId, principal.userId);
+  if (!membership || !roleCanManageEvent(membership.role)) return reply.code(403).send({ error: 'organizer_required' });
+  return { event: await getEventBundle(eventId, principal.userId), management: true };
 });
 
 const port = Number(process.env.PORT ?? 3000);
