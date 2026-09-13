@@ -13,12 +13,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.breyhanaariel.glossedtip.feature.booking.BookingScreen
+import com.breyhanaariel.glossedtip.feature.booking.BookingViewModel
 import com.breyhanaariel.glossedtip.feature.home.HomeScreen
 import com.breyhanaariel.glossedtip.feature.portfolio.PortfolioScreen
 import com.breyhanaariel.glossedtip.feature.profile.ProfileScreen
@@ -35,6 +37,7 @@ private val destinations = listOf(
 @Composable
 fun GlossedTipApp() {
     val navController = rememberNavController()
+    val bookingViewModel: BookingViewModel = viewModel()
     val backStack by navController.currentBackStackEntryAsState()
     val currentRoute = backStack?.destination?.route
 
@@ -59,10 +62,21 @@ fun GlossedTipApp() {
         }
     ) { padding ->
         NavHost(navController = navController, startDestination = "home") {
-            composable("home") { HomeScreen(padding, onBook = { navController.navigate("book") }, onPortfolio = { navController.navigate("portfolio") }) }
-            composable("portfolio") { PortfolioScreen(padding, onBookSet = { navController.navigate("book") }) }
-            composable("book") { BookingScreen(padding) }
-            composable("profile") { ProfileScreen(padding) }
+            composable("home") {
+                HomeScreen(
+                    padding,
+                    onBook = { bookingViewModel.startOver(); navController.navigate("book") },
+                    onPortfolio = { navController.navigate("portfolio") },
+                )
+            }
+            composable("portfolio") {
+                PortfolioScreen(padding) { set ->
+                    bookingViewModel.preconfigurePortfolioSet(set)
+                    navController.navigate("book")
+                }
+            }
+            composable("book") { BookingScreen(padding, bookingViewModel) }
+            composable("profile") { ProfileScreen(padding, onBookAgain = { bookingViewModel.startOver(); navController.navigate("book") }) }
         }
     }
 }
