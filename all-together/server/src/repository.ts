@@ -12,6 +12,7 @@ import {
   invitations,
   messages,
   notifications,
+  photos,
   pollOptions,
   polls,
   pollVotes,
@@ -38,6 +39,9 @@ export async function getEventBundle(eventId: string, userId?: string) {
   const pollRows = await database.select().from(polls).where(eq(polls.eventId, eventId)).orderBy(asc(polls.closesAt));
   const pollIds = pollRows.map((p) => p.id);
   const options = pollIds.length ? await database.select().from(pollOptions).where(inArray(pollOptions.pollId, pollIds)) : [];
+  const voteCounts = pollIds.length
+    ? await database.select({ optionId: pollVotes.optionId, count: sql<number>`count(*)` }).from(pollVotes).where(inArray(pollVotes.pollId, pollIds)).groupBy(pollVotes.optionId)
+    : [];
   const expenseRows = await database.select().from(expenses).where(eq(expenses.eventId, eventId)).orderBy(desc(expenses.createdAt));
   const expenseIds = expenseRows.map((e) => e.id);
   const shares = expenseIds.length ? await database.select().from(expenseShares).where(inArray(expenseShares.expenseId, expenseIds)) : [];
@@ -48,6 +52,12 @@ export async function getEventBundle(eventId: string, userId?: string) {
     .innerJoin(users, eq(messages.senderUserId, users.id))
     .where(and(eq(messages.eventId, eventId), isNull(messages.removedAt)))
     .orderBy(asc(messages.createdAt));
+  const photoRows = await database
+    .select({ id: photos.id, caption: photos.caption, secureUrl: photos.secureUrl, cloudinaryPublicId: photos.cloudinaryPublicId, createdAt: photos.createdAt, uploaderUserId: photos.uploaderUserId, uploaderName: users.displayName })
+    .from(photos)
+    .innerJoin(users, eq(photos.uploaderUserId, users.id))
+    .where(and(eq(photos.eventId, eventId), isNull(photos.removedAt)))
+    .orderBy(desc(photos.createdAt));
 
   let membership: { role: EventRole; householdManager: boolean } | null = null;
   if (userId) {
@@ -61,10 +71,17 @@ export async function getEventBundle(eventId: string, userId?: string) {
     membership,
     schedule,
     households: householdRows.map((household) => ({ ...household, people: people.filter((person) => person.householdId === household.id) })),
-    polls: pollRows.map((poll) => ({ ...poll, options: options.filter((option) => option.pollId === poll.id) })),
+    polls: pollRows.map((poll) => ({
+      ...poll,
+      options: options.filter((option) => option.pollId === poll.id).map((option) => ({
+        ...option,
+        votes: Number(voteCounts.find((row) => row.optionId === option.id)?.count ?? 0),
+      })),
+    })),
     expenses: expenseRows.map((expense) => ({ ...expense, shares: shares.filter((share) => share.expenseId === expense.id) })),
     tasks: taskRows,
     chat,
+    photos: photoRows,
   };
 }
 
