@@ -1,0 +1,68 @@
+name: Build AllTogether Android Preview
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'all-together/**'
+      - '.github/workflows/build-all-together.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: all-together
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.13.0'
+          cache: npm
+          cache-dependency-path: all-together/package-lock.json
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install mobile dependencies
+        run: npm install
+
+      - name: Typecheck mobile app
+        run: npm run typecheck
+
+      - name: Test mobile app
+        run: npm test -- --passWithNoTests
+
+      - name: Install API dependencies
+        run: npm install
+        working-directory: all-together/server
+
+      - name: Typecheck API
+        run: npm run typecheck
+        working-directory: all-together/server
+
+      - name: Prebuild Android project
+        run: npx expo prebuild --platform android --non-interactive
+
+      - name: Build Android debug APK
+        run: ./gradlew assembleDebug
+        working-directory: all-together/android
+
+      - name: Upload Android preview
+        uses: actions/upload-artifact@v4
+        with:
+          name: all-together-android-preview
+          path: all-together/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
