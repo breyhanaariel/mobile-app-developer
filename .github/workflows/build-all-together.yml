@@ -15,6 +15,9 @@ permissions:
 jobs:
   test-and-build:
     runs-on: ubuntu-latest
+    env:
+      CI: '1'
+      NODE_ENV: development
     defaults:
       run:
         working-directory: all-together
@@ -37,6 +40,9 @@ jobs:
       - name: Install mobile dependencies
         run: npm install
 
+      - name: Validate Expo dependency alignment
+        run: npx expo install --check
+
       - name: Typecheck mobile app
         run: npm run typecheck
 
@@ -52,7 +58,7 @@ jobs:
         working-directory: all-together/server
 
       - name: Prebuild Android project
-        run: npx expo prebuild --platform android --non-interactive
+        run: npx expo prebuild --platform android
 
       - name: Build Android debug APK
         run: ./gradlew assembleDebug
