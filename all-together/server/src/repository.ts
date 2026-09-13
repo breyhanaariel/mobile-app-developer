@@ -1,10 +1,12 @@
-import { and, asc, desc, eq, isNull, or, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, isNull, sql } from 'drizzle-orm';
 import { db } from './db.js';
 import {
   eventMemberships,
   events,
   expenseShares,
   expenses,
+  familyGroups,
+  familyMemberships,
   householdPeople,
   households,
   invitations,
@@ -32,19 +34,13 @@ export async function getEventBundle(eventId: string, userId?: string) {
   const schedule = await database.select().from(scheduleItems).where(eq(scheduleItems.eventId, eventId)).orderBy(asc(scheduleItems.startsAt));
   const householdRows = await database.select().from(households).where(eq(households.eventId, eventId));
   const householdIds = householdRows.map((h) => h.id);
-  const people = householdIds.length
-    ? await database.select().from(householdPeople).where(sql`${householdPeople.householdId} = ANY(${householdIds})`)
-    : [];
+  const people = householdIds.length ? await database.select().from(householdPeople).where(inArray(householdPeople.householdId, householdIds)) : [];
   const pollRows = await database.select().from(polls).where(eq(polls.eventId, eventId)).orderBy(asc(polls.closesAt));
   const pollIds = pollRows.map((p) => p.id);
-  const options = pollIds.length
-    ? await database.select().from(pollOptions).where(sql`${pollOptions.pollId} = ANY(${pollIds})`)
-    : [];
+  const options = pollIds.length ? await database.select().from(pollOptions).where(inArray(pollOptions.pollId, pollIds)) : [];
   const expenseRows = await database.select().from(expenses).where(eq(expenses.eventId, eventId)).orderBy(desc(expenses.createdAt));
   const expenseIds = expenseRows.map((e) => e.id);
-  const shares = expenseIds.length
-    ? await database.select().from(expenseShares).where(sql`${expenseShares.expenseId} = ANY(${expenseIds})`)
-    : [];
+  const shares = expenseIds.length ? await database.select().from(expenseShares).where(inArray(expenseShares.expenseId, expenseIds)) : [];
   const taskRows = await database.select().from(tasks).where(eq(tasks.eventId, eventId)).orderBy(asc(tasks.dueAt));
   const chat = await database
     .select({ id: messages.id, body: messages.body, createdAt: messages.createdAt, senderUserId: messages.senderUserId, senderName: users.displayName })
@@ -64,27 +60,63 @@ export async function getEventBundle(eventId: string, userId?: string) {
     event,
     membership,
     schedule,
-    households: householdRows.map((household) => ({
-      ...household,
-      people: people.filter((person) => person.householdId === household.id),
-    })),
-    polls: pollRows.map((poll) => ({
-      ...poll,
-      options: options.filter((option) => option.pollId === poll.id),
-    })),
-    expenses: expenseRows.map((expense) => ({
-      ...expense,
-      shares: shares.filter((share) => share.expenseId === expense.id),
-    })),
+    households: householdRows.map((household) => ({ ...household, people: people.filter((person) => person.householdId === household.id) })),
+    polls: pollRows.map((poll) => ({ ...poll, options: options.filter((option) => option.pollId === poll.id) })),
+    expenses: expenseRows.map((expense) => ({ ...expense, shares: shares.filter((share) => share.expenseId === expense.id) })),
     tasks: taskRows,
     chat,
   };
+}
+
+export async function listUserEvents(userId: string) {
+  const database = requireDb();
+  return database
+    .select({ event: events, role: eventMemberships.role })
+    .from(eventMemberships)
+    .innerJoin(events, eq(eventMemberships.eventId, events.id))
+    .where(eq(eventMemberships.userId, userId))
+    .orderBy(asc(events.startsAt));
 }
 
 export async function getMembership(eventId: string, userId: string) {
   const database = requireDb();
   const [membership] = await database.select().from(eventMemberships).where(and(eq(eventMemberships.eventId, eventId), eq(eventMemberships.userId, userId))).limit(1);
   return membership ?? null;
+}
+
+export async function createEvent(input: {
+  userId: string;
+  familyGroupId?: string;
+  title: string;
+  type: string;
+  description?: string;
+  locationName: string;
+  startsAt: Date;
+  endsAt: Date;
+}) {
+  const database = requireDb();
+  let familyGroupId = input.familyGroupId;
+  if (!familyGroupId) {
+    const [group] = await database.insert(familyGroups).values({ name: `${input.title} Family Group` }).returning();
+    familyGroupId = group.id;
+    await database.insert(familyMemberships).values({ familyGroupId, userId: input.userId, role: 'organizer' }).onConflictDoNothing();
+  }
+  const inviteCode = `AT-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
+  const [event] = await database.insert(events).values({
+    familyGroupId,
+    title: input.title,
+    type: input.type,
+    description: input.description ?? '',
+    locationName: input.locationName,
+    startsAt: input.startsAt,
+    endsAt: input.endsAt,
+    isPrivate: true,
+    inviteCode,
+    createdByUserId: input.userId,
+  }).returning();
+  await database.insert(eventMemberships).values({ eventId: event.id, userId: input.userId, role: 'organizer' });
+  await database.insert(invitations).values({ eventId: event.id, createdByUserId: input.userId, code: inviteCode, role: 'family-member' });
+  return event;
 }
 
 export async function updateHouseholdRsvp(householdId: string, userId: string, status: 'yes' | 'no' | 'maybe' | 'pending', attendance?: Record<string, boolean>) {
@@ -94,7 +126,6 @@ export async function updateHouseholdRsvp(householdId: string, userId: string, s
   const membership = await getMembership(household.eventId, userId);
   const canManage = household.managerUserId === userId || membership?.role === 'organizer' || membership?.role === 'co-organizer';
   if (!canManage) return { kind: 'forbidden' as const };
-
   await database.update(households).set({ rsvp: status }).where(eq(households.id, householdId));
   if (attendance) {
     for (const [personId, attending] of Object.entries(attendance)) {
@@ -119,23 +150,14 @@ export async function acceptInvitation(code: string, userId: string, email: stri
   if (invitation.expiresAt && invitation.expiresAt < new Date()) return { kind: 'expired' as const };
   if (invitation.maxUses != null && invitation.useCount >= invitation.maxUses) return { kind: 'exhausted' as const };
   if (invitation.email && invitation.email.toLowerCase() !== email.toLowerCase()) return { kind: 'email_mismatch' as const };
-
-  await database.insert(eventMemberships).values({ eventId: invitation.eventId, userId, role: invitation.role }).onConflictDoUpdate({
-    target: [eventMemberships.eventId, eventMemberships.userId],
-    set: { role: invitation.role },
-  });
+  await database.insert(eventMemberships).values({ eventId: invitation.eventId, userId, role: invitation.role }).onConflictDoUpdate({ target: [eventMemberships.eventId, eventMemberships.userId], set: { role: invitation.role } });
   await database.update(invitations).set({ useCount: sql`${invitations.useCount} + 1` }).where(eq(invitations.id, invitation.id));
   return { kind: 'ok' as const, eventId: invitation.eventId, role: invitation.role as EventRole };
 }
 
 export async function previewInvitation(code: string) {
   const database = requireDb();
-  const [row] = await database
-    .select({ invitation: invitations, event: events })
-    .from(invitations)
-    .innerJoin(events, eq(invitations.eventId, events.id))
-    .where(and(eq(invitations.code, code.toUpperCase()), isNull(invitations.revokedAt)))
-    .limit(1);
+  const [row] = await database.select({ invitation: invitations, event: events }).from(invitations).innerJoin(events, eq(invitations.eventId, events.id)).where(and(eq(invitations.code, code.toUpperCase()), isNull(invitations.revokedAt))).limit(1);
   return row ?? null;
 }
 
@@ -146,7 +168,8 @@ export async function votePoll(pollId: string, optionIds: string[], userId: stri
   if (poll.closesAt && poll.closesAt < new Date()) return { kind: 'closed' as const };
   if (!(await getMembership(poll.eventId, userId))) return { kind: 'forbidden' as const };
   if (poll.mode === 'single' && optionIds.length !== 1) return { kind: 'invalid' as const };
-
+  const validOptions = await database.select({ id: pollOptions.id }).from(pollOptions).where(and(eq(pollOptions.pollId, pollId), inArray(pollOptions.id, optionIds.length ? optionIds : ['00000000-0000-0000-0000-000000000000'])));
+  if (validOptions.length !== optionIds.length) return { kind: 'invalid' as const };
   await database.delete(pollVotes).where(and(eq(pollVotes.pollId, pollId), eq(pollVotes.userId, userId)));
   if (optionIds.length) await database.insert(pollVotes).values(optionIds.map((optionId) => ({ pollId, optionId, userId })));
   return { kind: 'ok' as const };
