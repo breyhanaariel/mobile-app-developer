@@ -28,17 +28,17 @@ Each app remains independently buildable inside the shared `mobile-app-developer
 ### 01 — Glossed Tip
 
 **Independent mobile nail technician booking system**  
-**Status:** In Development
+**Status:** Demo Complete / Cloud Integration Pending
 
 **Client scenario:** A solo mobile nail technician needs a branded booking and client-management system that replaces scheduling through DMs, manually checking travel feasibility, and disconnected payment tools.
 
-Glossed Tip is designed around a mobile service model. Customers can browse nail sets and services, use **Book This Set**, enter a service address, see only travel-feasible appointment times, upload inspiration photos, pay a 25% deposit, receive reminders, reschedule within policy, join a waitlist, and rebook previous services.
+Glossed Tip is designed around a mobile service model. Customers can browse nail sets and services, use **Book This Set**, enter a service address, see only travel-feasible appointment times, upload inspiration photos, calculate a 25% deposit, review cancellation policy, and rebook previous services. The credential-free portfolio build uses deterministic fictional Pinellas County travel zones while production integration seams are prepared for Firebase, Google Places/Routes, and Stripe.
 
-The technician receives a dedicated responsive web admin dashboard for daily route-aware scheduling, appointments, clients, services, portfolio content, availability, waitlist management, analytics, and business settings.
+The technician receives a dedicated responsive web admin dashboard demo for daily route-aware scheduling, appointments, clients, services, portfolio content, availability, waitlist management, analytics, and business settings.
 
-**Technical focus:** Native Android • Kotlin • Jetpack Compose • Firebase • Stripe test mode • maps/routing • push notifications
+**Technical focus:** Native Android • Kotlin • Jetpack Compose • route-aware scheduling • Firebase architecture • Stripe integration architecture • maps/routing • automated testing/CI
 
-**Portfolio proof:** Native mobile development, location-aware booking logic, payments, media uploads, authentication, notifications, route-aware scheduling, and a complete customer + business-management system.
+**Portfolio proof:** Native mobile development, location-aware booking logic, payment-state design, media uploads, authentication architecture, route-aware scheduling, business rules, testing, and a complete customer + business-management product concept.
 
 ### 02 — AllTogether
 
