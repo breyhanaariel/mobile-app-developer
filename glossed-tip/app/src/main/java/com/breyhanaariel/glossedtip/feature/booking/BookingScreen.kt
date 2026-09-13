@@ -11,13 +11,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.breyhanaariel.glossedtip.domain.model.*
 import java.text.NumberFormat
 import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BookingScreen(padding: PaddingValues, vm: BookingViewModel = viewModel()) {
+fun BookingScreen(padding: PaddingValues, vm: BookingViewModel) {
     val draft = vm.draft
     val canGoBack = draft.step !in setOf(BookingStep.SERVICE, BookingStep.CONFIRMATION)
     Scaffold(
@@ -44,6 +44,7 @@ fun BookingScreen(padding: PaddingValues, vm: BookingViewModel = viewModel()) {
 @Composable
 private fun ServiceStep(draft: BookingDraft, vm: BookingViewModel, padding: PaddingValues) = BookingList(padding) {
     item { Text("Book Glossed Tip", style = MaterialTheme.typography.headlineMedium) }
+    draft.portfolioSet?.let { set -> item { AssistChip(onClick = {}, label = { Text("From set: ${set.title}") }) } }
     item { Text("Guest browsing is public. Google or phone verification will be required when real booking persistence is enabled.") }
     item { ProgressLabel(1, "Service") }
     items(SampleData.services) { service ->
@@ -185,6 +186,7 @@ private fun SummaryCard(draft: BookingDraft) {
     Card {
         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Text(draft.service?.name ?: "Service", style = MaterialTheme.typography.titleLarge)
+            draft.portfolioSet?.let { Text("Inspired by: ${it.title}") }
             Text("${draft.customization.length.label} • ${draft.customization.shape.label} • ${draft.customization.artLevel.label} art")
             Text("${draft.serviceAddress.street}, ${draft.serviceAddress.city}, FL ${draft.serviceAddress.zipCode}")
             draft.selectedSlot?.let { Text("${it.dayLabel}, ${it.dateLabel} at ${it.timeLabel}") }
