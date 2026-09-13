@@ -14,34 +14,46 @@ The portfolio is primarily designed for freelance clients while retaining enough
 
 ## Flagship Projects
 
-### 01 — Independent Nail Technician Booking System
+### 01 — Glossed Tip
 
-**Status:** Concept / In Development  
-**Client scenario:** A solo nail technician needs a branded booking and client-management system that replaces scheduling through DMs and disconnected payment tools.
+**Independent mobile nail technician booking system**  
+**Status:** In Development
 
-The customer experience will support service discovery, nail portfolio browsing, appointment booking, add-ons, inspiration-photo uploads, deposits, reminders, cancellations/rescheduling, and rebooking. A dedicated responsive web admin dashboard will let the technician manage availability, services, pricing, appointments, portfolio content, client notes, and booking status.
+**Client scenario:** A solo mobile nail technician needs a branded booking and client-management system that replaces scheduling through DMs, manually checking travel feasibility, and disconnected payment tools.
 
-**Technical focus:** Native Android • Kotlin • Jetpack Compose • Firebase • Stripe test mode
+Glossed Tip is designed around a mobile service model. Customers can browse nail sets and services, use **Book This Set**, enter a service address, see only travel-feasible appointment times, upload inspiration photos, pay a 25% deposit, receive reminders, reschedule within policy, join a waitlist, and rebook previous services.
 
-**Portfolio proof:** Native mobile development, booking logic, payments, media uploads, notifications, customer accounts, and a complete customer + business-management system.
+The technician receives a dedicated responsive web admin dashboard for daily route-aware scheduling, appointments, clients, services, portfolio content, availability, waitlist management, analytics, and business settings.
 
-### 02 — Family Event Planning Platform
+**Technical focus:** Native Android • Kotlin • Jetpack Compose • Firebase • Stripe test mode • maps/routing • push notifications
 
-**Status:** Concept / Planned  
-**Client scenario:** A family organizer wants one private place to coordinate reunions, birthdays, vacations, and other multi-generational family events instead of relying on group texts, spreadsheets, and scattered apps.
+**Portfolio proof:** Native mobile development, location-aware booking logic, payments, media uploads, authentication, notifications, route-aware scheduling, and a complete customer + business-management system.
 
-The app will support event creation, household-based RSVPs, schedules, polls, shared expenses, responsibilities, invitations, family roles, chat, photos, reminders, and event-specific planning. The experience will deliberately account for family members with different ages and levels of technical comfort.
+### 02 — AllTogether
 
-**Technical focus:** iOS + Android • React Native • TypeScript • Custom API/backend • PostgreSQL
+**Family event planning platform**  
+**Status:** Planned
 
-**Portfolio proof:** Cross-platform development, custom backend architecture, database design, authorization, collaboration, real-time features, accessibility, and complex multi-user product design.
+**Client scenario:** A family organizer wants one private place to coordinate reunions, birthdays, vacations, holidays, and other multi-generational family events instead of relying on group texts, spreadsheets, and scattered apps.
 
-### 03 — Food Truck Ordering & Loyalty App
+AllTogether is event-centered rather than feed-centered. Planned features include event creation, household-based RSVPs, schedules, polls, responsibilities, shared expenses, invitations, family roles, chat, photos, reminders, and simple multi-generational UX.
 
-**Status:** Concept / Planned  
-**Client scenario:** A food truck owner wants a branded mobile experience that helps customers find the truck, browse the current menu, order ahead, pay, and return through a loyalty program.
+**Signature feature:** Household RSVP — one family member can manage attendance for their household without requiring every attendee to create an account.
 
-Customers will be able to see current/upcoming truck locations, browse available menu items, customize orders, place order-ahead purchases using sandbox payments, receive order-status notifications, and participate in loyalty/rewards. A responsive web admin dashboard will support menus, item availability, incoming orders, truck locations, promotions, and business operations.
+**Technical focus:** iOS + Android • React Native • TypeScript • custom API/backend • PostgreSQL
+
+**Portfolio proof:** Cross-platform development, custom backend architecture, database design, authorization, real-time collaboration, accessibility, and complex multi-user product design.
+
+### 03 — Bite Route
+
+**Food truck ordering, location & loyalty app**  
+**Status:** Planned
+
+**Client scenario:** A food truck owner wants a branded mobile experience that helps customers find the truck, browse the current menu, order ahead, pay, track pickup status, and return through a loyalty program.
+
+Customers will be able to see current/upcoming truck locations, browse available menu items, customize orders, place order-ahead purchases using sandbox payments, receive order-status notifications, and participate in loyalty/rewards. A responsive web admin dashboard will support menus, sold-out states, item availability, incoming orders, pickup wait times, truck locations, promotions, loyalty, and pausing online ordering.
+
+**Signature feature:** Find the Truck — current location, operating status, today's hours, estimated pickup time, and next scheduled stop are immediately visible.
 
 **Technical focus:** iOS + Android • Flutter • backend services selected during architecture phase • Stripe test mode • maps/location
 
@@ -51,9 +63,9 @@ Customers will be able to see current/upcoming truck locations, browse available
 
 The three projects are intentionally different rather than variations of the same CRUD application:
 
-- **Nail Technician:** service business + scheduling + deposits
-- **Family Planner:** custom consumer product + collaboration + custom backend
-- **Food Truck:** commerce + location + orders + loyalty
+- **Glossed Tip:** mobile service business + route-aware scheduling + deposits
+- **AllTogether:** custom consumer product + collaboration + custom backend
+- **Bite Route:** commerce + location + orders + loyalty
 
 Across the portfolio, authentication patterns will be demonstrated where they naturally fit, including email/password, Google, Apple, phone/OTP, guest access, and device/biometric re-entry where appropriate. Authentication methods will not be artificially duplicated across every project.
 
@@ -99,9 +111,9 @@ Only real technical measurements and actual outcomes will be reported. No fictio
 
 Projects will be built one at a time and made genuinely functional before moving to the next:
 
-1. Independent Nail Technician Booking System
-2. Family Event Planning Platform
-3. Food Truck Ordering & Loyalty App
+1. **Glossed Tip** — mobile nail technician booking system
+2. **AllTogether** — family event planning platform
+3. **Bite Route** — food truck ordering & loyalty app
 
 Each application will ultimately have public source code and a usable/demo-ready build where practical. The applications themselves will live in separate public repositories; this repository remains the portfolio website and case-study hub.
 
