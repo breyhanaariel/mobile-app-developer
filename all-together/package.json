@@ -9,17 +9,17 @@
     "ios": "expo start --ios",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "prebuild:android": "expo prebuild --platform android --non-interactive"
+    "prebuild:android": "expo prebuild --platform android"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
-    "expo": "^57.0.0",
-    "expo-image-picker": "~17.0.8",
-    "expo-linking": "~8.0.8",
-    "expo-notifications": "~0.32.12",
+    "expo": "^57.0.17",
+    "expo-image-picker": "~17.0.11",
+    "expo-linking": "~8.0.12",
+    "expo-notifications": "~0.32.17",
     "expo-status-bar": "~3.0.9",
     "react": "19.2.3",
-    "react-native": "0.86.0",
+    "react-native": "0.86.3",
     "react-native-safe-area-context": "~5.6.2"
   },
   "devDependencies": {
