@@ -14,35 +14,15 @@ I design and build complete mobile applications for **small businesses, entrepre
 
 💌 **Available For Freelance** [![Email](https://img.shields.io/badge/Email-D14836?style=flat-square&logo=gmail&logoColor=white)](mailto:breyhanadickenson@gmail.com?subject=Mobile%20App%20Project%20Inquiry)
 
+📱 **[View Live Portfolio](https://breyhanaariel.github.io/mobile-app-developer/)**
+
 I take on mobile app projects for independent professionals, entrepreneurs, and small businesses, including MVPs, scheduling apps, business apps, app redesigns, new features, bug fixes, backend/API integrations, payments/authentication, and owner/staff dashboards.
 
-![Mobile App Services & Packages](./assets/services-packages-cover.svg)
+[![Mobile App Services & Packages](./assets/services-packages-cover.svg)](https://breyhanaariel.github.io/mobile-app-developer/services.html)
 
-### App Packages
-
-| Package | Starting Price | Best For |
-| --- | ---: | --- |
-| **Showcase App** | **$100** | Portfolios, catalogs, menus, informational apps, and simple branded experiences. A lightweight API/database can be included when appropriate; complex accounts and business logic are outside this tier. |
-| **Scheduling App** | **$250** | Appointment and service businesses needing booking, availability, customer details, basic authentication/database behavior, reminders, and basic Stripe payment/deposit integration. |
-| **Business App** | **$500** | Businesses needing customer accounts, backend/database behavior, integrations, payments where appropriate, notifications, and more advanced workflows. |
-| **Business App + Dashboard** | **$1,000** | A customer-facing mobile app plus a responsive owner/staff dashboard, roles, backend/database, operational controls, integrations, testing, and launch preparation. |
-| **Custom App** | **$2,000** | Advanced custom products with more complex workflows, architecture, integrations, roles, or business requirements. |
-
-**Cross-platform packages include both iOS + Android by default.** Native single-platform work and unusually complex requirements are quoted based on scope. Starting prices assume a clearly defined, portfolio-scale scope; final pricing is confirmed after requirements are reviewed.
-
-### Development & Support Services
-
-**MVP Development** · **Full Mobile App Development** · **App Redesign & Modernization** · **Feature Development** · **Bug Fixes & Maintenance** · **Backend/API Integration** · **Payments & Authentication** · **Admin Dashboard Development**
-
-| Support Option | Price | Scope |
-| --- | ---: | --- |
-| **Hourly Support** | **$35/hour** | Troubleshooting, debugging, small repairs, configuration help, and undefined issues. |
-| **Feature Pack** | **from $75** | One small, clearly defined feature or improvement to an existing app. Larger features, major redesigns, integrations, and architectural changes are quoted separately. |
-| **Maintenance** | **$100/month** | Up to **3 small bug fixes + 1 small new feature per month**, with a standard 3-business-day turnaround after the files, access, information, and reproduction/details needed to begin are received. |
-
-Unused Maintenance allowances roll over while the plan remains active. **Bug fixes can accumulate up to a maximum balance of 6 fixes, and new features can accumulate up to a maximum balance of 6 features.** The standard turnaround applies to each qualifying fix or feature rather than an accumulated backlog. Larger, urgent, complex, redesign, integration, or architectural work is quoted separately.
-
-**Idea → UI/UX → Mobile App → Backend → Testing → Launch Preparation**
+🌷 **[View Services, Packages & Project Inquiry →](https://breyhanaariel.github.io/mobile-app-developer/services.html)**  
+💌 **[Send a Project Inquiry →](https://breyhanaariel.github.io/mobile-app-developer/services.html#inquiry)**  
+Prefer email? [breyhanadickenson@gmail.com](mailto:breyhanadickenson@gmail.com?subject=Mobile%20App%20Project%20Inquiry)
 
 ---
 
