@@ -1,6 +1,7 @@
 import { and, asc, desc, eq, inArray, isNull, sql } from 'drizzle-orm';
 import { db } from './db.js';
 import {
+  activityRsvps,
   eventMemberships,
   events,
   expenseShares,
@@ -33,25 +34,44 @@ export async function getEventBundle(eventId: string, userId?: string) {
   if (!event) return null;
 
   const schedule = await database.select().from(scheduleItems).where(eq(scheduleItems.eventId, eventId)).orderBy(asc(scheduleItems.startsAt));
+  const scheduleIds = schedule.map((item) => item.id);
+  const myActivityRsvps = userId && scheduleIds.length
+    ? await database.select().from(activityRsvps).where(and(eq(activityRsvps.userId, userId), inArray(activityRsvps.scheduleItemId, scheduleIds)))
+    : [];
+
   const householdRows = await database.select().from(households).where(eq(households.eventId, eventId));
   const householdIds = householdRows.map((h) => h.id);
   const people = householdIds.length ? await database.select().from(householdPeople).where(inArray(householdPeople.householdId, householdIds)) : [];
+
   const pollRows = await database.select().from(polls).where(eq(polls.eventId, eventId)).orderBy(asc(polls.closesAt));
   const pollIds = pollRows.map((p) => p.id);
   const options = pollIds.length ? await database.select().from(pollOptions).where(inArray(pollOptions.pollId, pollIds)) : [];
   const voteCounts = pollIds.length
     ? await database.select({ optionId: pollVotes.optionId, count: sql<number>`count(*)` }).from(pollVotes).where(inArray(pollVotes.pollId, pollIds)).groupBy(pollVotes.optionId)
     : [];
+
   const expenseRows = await database.select().from(expenses).where(eq(expenses.eventId, eventId)).orderBy(desc(expenses.createdAt));
   const expenseIds = expenseRows.map((e) => e.id);
   const shares = expenseIds.length ? await database.select().from(expenseShares).where(inArray(expenseShares.expenseId, expenseIds)) : [];
+  const relevantUserIds = Array.from(new Set([
+    ...expenseRows.map((expense) => expense.payerUserId).filter(Boolean),
+    ...shares.map((share) => share.userId),
+  ] as string[]));
+  const relevantUsers = relevantUserIds.length ? await database.select().from(users).where(inArray(users.id, relevantUserIds)) : [];
+  const nameFor = (id: string | null | undefined) => relevantUsers.find((user) => user.id === id)?.displayName ?? 'Family member';
+
   const taskRows = await database.select().from(tasks).where(eq(tasks.eventId, eventId)).orderBy(asc(tasks.dueAt));
+  const taskAssigneeIds = Array.from(new Set(taskRows.map((task) => task.assigneeUserId).filter(Boolean) as string[]));
+  const taskAssignees = taskAssigneeIds.length ? await database.select().from(users).where(inArray(users.id, taskAssigneeIds)) : [];
+  const taskNameFor = (id: string | null | undefined) => taskAssignees.find((user) => user.id === id)?.displayName ?? 'Family member';
+
   const chat = await database
     .select({ id: messages.id, body: messages.body, createdAt: messages.createdAt, senderUserId: messages.senderUserId, senderName: users.displayName })
     .from(messages)
     .innerJoin(users, eq(messages.senderUserId, users.id))
     .where(and(eq(messages.eventId, eventId), isNull(messages.removedAt)))
     .orderBy(asc(messages.createdAt));
+
   const photoRows = await database
     .select({ id: photos.id, caption: photos.caption, secureUrl: photos.secureUrl, cloudinaryPublicId: photos.cloudinaryPublicId, createdAt: photos.createdAt, uploaderUserId: photos.uploaderUserId, uploaderName: users.displayName })
     .from(photos)
@@ -69,7 +89,10 @@ export async function getEventBundle(eventId: string, userId?: string) {
   return {
     event,
     membership,
-    schedule,
+    schedule: schedule.map((item) => ({
+      ...item,
+      myRsvp: myActivityRsvps.find((rsvp) => rsvp.scheduleItemId === item.id)?.status ?? 'pending',
+    })),
     households: householdRows.map((household) => ({ ...household, people: people.filter((person) => person.householdId === household.id) })),
     polls: pollRows.map((poll) => ({
       ...poll,
@@ -78,8 +101,12 @@ export async function getEventBundle(eventId: string, userId?: string) {
         votes: Number(voteCounts.find((row) => row.optionId === option.id)?.count ?? 0),
       })),
     })),
-    expenses: expenseRows.map((expense) => ({ ...expense, shares: shares.filter((share) => share.expenseId === expense.id) })),
-    tasks: taskRows,
+    expenses: expenseRows.map((expense) => ({
+      ...expense,
+      payerName: nameFor(expense.payerUserId),
+      shares: shares.filter((share) => share.expenseId === expense.id).map((share) => ({ ...share, userName: nameFor(share.userId) })),
+    })),
+    tasks: taskRows.map((task) => ({ ...task, assigneeName: taskNameFor(task.assigneeUserId) })),
     chat,
     photos: photoRows,
   };
@@ -152,12 +179,47 @@ export async function updateHouseholdRsvp(householdId: string, userId: string, s
   return { kind: 'ok' as const };
 }
 
+export async function setActivityRsvp(scheduleItemId: string, userId: string, status: 'yes' | 'no' | 'maybe' | 'pending') {
+  const database = requireDb();
+  const [item] = await database.select().from(scheduleItems).where(eq(scheduleItems.id, scheduleItemId)).limit(1);
+  if (!item) return { kind: 'not_found' as const };
+  if (!item.optionalRsvp) return { kind: 'not_allowed' as const };
+  if (!(await getMembership(item.eventId, userId))) return { kind: 'forbidden' as const };
+  await database.insert(activityRsvps).values({ scheduleItemId, userId, status }).onConflictDoUpdate({
+    target: [activityRsvps.scheduleItemId, activityRsvps.userId],
+    set: { status },
+  });
+  return { kind: 'ok' as const };
+}
+
 export async function postMessage(eventId: string, userId: string, body: string) {
   const database = requireDb();
   const membership = await getMembership(eventId, userId);
   if (!membership) return { kind: 'forbidden' as const };
   const [created] = await database.insert(messages).values({ eventId, senderUserId: userId, body }).returning();
   return { kind: 'ok' as const, message: created };
+}
+
+export async function removeMessage(messageId: string, userId: string) {
+  const database = requireDb();
+  const [message] = await database.select().from(messages).where(eq(messages.id, messageId)).limit(1);
+  if (!message) return { kind: 'not_found' as const };
+  const membership = await getMembership(message.eventId, userId);
+  const canRemove = message.senderUserId === userId || membership?.role === 'organizer' || membership?.role === 'co-organizer';
+  if (!canRemove) return { kind: 'forbidden' as const };
+  await database.update(messages).set({ removedAt: new Date() }).where(eq(messages.id, messageId));
+  return { kind: 'ok' as const };
+}
+
+export async function removePhoto(photoId: string, userId: string) {
+  const database = requireDb();
+  const [photo] = await database.select().from(photos).where(eq(photos.id, photoId)).limit(1);
+  if (!photo) return { kind: 'not_found' as const };
+  const membership = await getMembership(photo.eventId, userId);
+  const canRemove = photo.uploaderUserId === userId || membership?.role === 'organizer' || membership?.role === 'co-organizer';
+  if (!canRemove) return { kind: 'forbidden' as const };
+  await database.update(photos).set({ removedAt: new Date() }).where(eq(photos.id, photoId));
+  return { kind: 'ok' as const, cloudinaryPublicId: photo.cloudinaryPublicId };
 }
 
 export async function acceptInvitation(code: string, userId: string, email: string) {
