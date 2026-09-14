@@ -1,4 +1,4 @@
-name: Build AllTogether Android Release
+name: Build AllTogether Mobile Release
 
 on:
   push:
@@ -71,6 +71,9 @@ jobs:
         run: npm run build
         working-directory: all-together/server
 
+      - name: Validate iOS native project generation
+        run: npx expo prebuild --platform ios --no-install
+
       - name: Prebuild Android project
         run: npx expo prebuild --platform android
 
@@ -111,5 +114,5 @@ jobs:
             "dist/${{ steps.version.outputs.apk }}" \
             --repo "${{ github.repository }}" \
             --title "AllTogether v${{ steps.version.outputs.number }}" \
-            --notes "Automated AllTogether Android portfolio prerelease from main. This build supports the seeded Carter Family Reunion demo and is prepared for Clerk, Neon, Cloudinary, Google Maps, Expo Push, and email integrations. External credentials remain outside GitHub." \
+            --notes "Automated tested AllTogether portfolio prerelease from main. Mobile typecheck/tests, API typecheck/tests/build, iOS native-project generation, and Android native compilation passed. Live provider credentials remain outside GitHub." \
             --prerelease
