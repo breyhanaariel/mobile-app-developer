@@ -31,6 +31,10 @@ jobs:
           channel: stable
           cache: true
 
+      - name: Generate iOS and Android native projects
+        working-directory: bite-route
+        run: flutter create --platforms=android,ios --org com.breyhanaariel .
+
       - name: Flutter dependencies
         working-directory: bite-route
         run: flutter pub get
@@ -117,5 +121,5 @@ jobs:
             "dist/${{ steps.version.outputs.apk }}" \
             --repo "${{ github.repository }}" \
             --title "Bite Route v${{ steps.version.outputs.number }}" \
-            --notes "Automated tested Bite Route portfolio prerelease. Flutter analyze/tests/build, Fastify API typecheck/tests/build, and Next.js admin typecheck/build passed. External Firebase, Stripe, Cloudinary, Maps and store credentials remain outside GitHub." \
+            --notes "Automated tested Bite Route portfolio prerelease. Flutter analyze/tests/build, iOS/Android project generation, Fastify API typecheck/tests/build, and Next.js admin typecheck/build passed. External Firebase, Stripe, Cloudinary, Maps and store credentials remain outside GitHub." \
             --prerelease
