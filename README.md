@@ -2,7 +2,7 @@
 
 > Complete mobile app solutions for small businesses, entrepreneurs, and custom product ideas.
 
-**Portfolio status:** Two flagship codebases complete / Bite Route planned
+**Portfolio status:** Three flagship codebases complete
 
 This repository is the source for my freelance-first Mobile Application Developer portfolio. The portfolio demonstrates complete app delivery: product thinking, UI/UX, implementation, authentication, databases, notifications, payments and booking where appropriate, testing, and deployment.
 
@@ -60,17 +60,23 @@ The backend uses a real seeded Neon PostgreSQL database with a Fastify/Drizzle A
 ### 03 — Bite Route
 
 **Food truck ordering, location & loyalty app**  
-**Status:** Planned
+**Status:** Code Complete / Live Neon Persistence / External Provider Setup Pending
 
 **Client scenario:** A food truck owner wants a branded mobile experience that helps customers find the truck, browse the current menu, order ahead, pay, track pickup status, and return through a loyalty program.
 
-Customers will be able to see current/upcoming truck locations, browse available menu items, customize orders, place order-ahead purchases using sandbox payments, receive order-status notifications, and participate in loyalty/rewards. A responsive web admin dashboard will support menus, sold-out states, item availability, incoming orders, pickup wait times, truck locations, promotions, loyalty, and pausing online ordering.
+Customers can see current/upcoming Tampa Bay truck locations, browse stop-aware menu availability, customize items, place ASAP or scheduled pickup orders, use guest checkout or Firebase account flows, receive order-status updates, redeem points, favorite items, reorder, and open Google Maps directions. Stripe sandbox PaymentSheet integration is wired for card payments plus Apple Pay/Google Pay configuration when credentials are supplied.
 
-**Signature feature:** Find the Truck — current location, operating status, today's hours, estimated pickup time, and next scheduled stop are immediately visible.
+A responsive Owner/Staff dashboard supports the live order queue, status progression, menu availability, sold-out states, truck stops, pause/resume ordering, wait-time overrides, promo creation, loyalty guidance, and database-derived analytics. No fictional metrics are presented as real business performance.
 
-**Technical focus:** iOS + Android • Flutter • backend services selected during architecture phase • Stripe test mode • maps/location
+**Signature feature:** Find the Truck — current/next location, ordering state, estimated pickup time, optional distance, and upcoming route are surfaced immediately.
 
-**Portfolio proof:** Flutter, mobile commerce, location/maps, order workflows, inventory/availability, payments, notifications, loyalty systems, and customer + business-management experiences.
+The backend uses a real seeded Neon PostgreSQL database with Fastify + TypeScript + Drizzle. Firebase Admin identity verification, FCM notification delivery, Stripe sandbox PaymentIntent creation/confirmation, Cloudinary signing, guest-order recovery, capacity-aware pickup logic, loyalty accounting, and Owner/Staff authorization are implemented in code. Provider credentials and store signing remain outside GitHub.
+
+**Technical focus:** iOS + Android • Flutter • Riverpod • Fastify • TypeScript • Neon PostgreSQL • Drizzle ORM • Firebase • Stripe sandbox • FCM • Cloudinary • Google Maps • Next.js • Tailwind CSS • CI/testing
+
+**Portfolio proof:** Flutter, mobile commerce, location/maps, stop-aware availability, modifier pricing, guest/account checkout, payment-state handling, capacity-aware pickup logic, notifications, loyalty, role-based operations, responsive business tooling, automated tests, iOS/Android project generation, and Android release packaging.
+
+**Verified release:** `bite-route-v001.apk`
 
 ## Skill Coverage Strategy
 
@@ -122,11 +128,11 @@ Only real technical measurements and actual outcomes are reported. No fictional 
 
 ## Development Order
 
-Projects are built one at a time and made genuinely functional before moving to the next:
+All three flagship application codebases are now complete at their documented portfolio boundaries:
 
 1. **Glossed Tip** — demo complete; live provider credentials/configuration pending
 2. **AllTogether** — code complete; live Neon persistence; external provider/account configuration pending
-3. **Bite Route** — next flagship build
+3. **Bite Route** — code complete; live Neon persistence; external provider/account configuration pending
 
 Each application remains inside this repository. GitHub Actions workflows are scoped per app so changes to one project can build that project independently.
 
