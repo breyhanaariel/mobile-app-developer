@@ -1,0 +1,121 @@
+name: Build Bite Route
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'bite-route/**'
+      - '.github/workflows/build-bite-route.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: bite-route-main-release
+  cancel-in-progress: true
+
+jobs:
+  test-build-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Flutter stable
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Flutter dependencies
+        working-directory: bite-route
+        run: flutter pub get
+
+      - name: Flutter analyze
+        working-directory: bite-route
+        run: flutter analyze
+
+      - name: Flutter unit tests
+        working-directory: bite-route
+        run: flutter test
+
+      - name: Build Android APK
+        working-directory: bite-route
+        run: flutter build apk --debug --dart-define=BITE_ROUTE_API_URL=http://10.0.2.2:3100
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.13.0'
+
+      - name: Install API dependencies
+        working-directory: bite-route/server
+        run: npm install
+
+      - name: Typecheck API
+        working-directory: bite-route/server
+        run: npm run typecheck
+
+      - name: Test API
+        working-directory: bite-route/server
+        run: npm test
+
+      - name: Build API
+        working-directory: bite-route/server
+        run: npm run build
+
+      - name: Install admin dependencies
+        working-directory: bite-route/admin
+        run: npm install
+
+      - name: Typecheck admin
+        working-directory: bite-route/admin
+        run: npm run typecheck
+
+      - name: Build admin
+        working-directory: bite-route/admin
+        env:
+          NEXT_PUBLIC_BITE_ROUTE_API_URL: http://localhost:3100
+        run: npm run build
+
+      - name: Calculate release version
+        id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          LAST=$(gh release list --limit 100 --json tagName --jq '[.[].tagName | select(test("^bite-route-v[0-9]{3}$")) | sub("bite-route-v"; "") | tonumber] | max // 0')
+          NEXT=$((LAST + 1))
+          VERSION=$(printf "%03d" "$NEXT")
+          echo "number=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=bite-route-v$VERSION" >> "$GITHUB_OUTPUT"
+          echo "apk=bite-route-v$VERSION.apk" >> "$GITHUB_OUTPUT"
+
+      - name: Package APK
+        working-directory: bite-route
+        run: |
+          mkdir -p dist
+          cp build/app/outputs/flutter-apk/app-debug.apk "dist/${{ steps.version.outputs.apk }}"
+
+      - name: Upload Android artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.version.outputs.tag }}
+          path: bite-route/dist/${{ steps.version.outputs.apk }}
+          if-no-files-found: error
+
+      - name: Publish GitHub prerelease
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        working-directory: bite-route
+        run: |
+          gh release create "${{ steps.version.outputs.tag }}" \
+            "dist/${{ steps.version.outputs.apk }}" \
+            --repo "${{ github.repository }}" \
+            --title "Bite Route v${{ steps.version.outputs.number }}" \
+            --notes "Automated tested Bite Route portfolio prerelease. Flutter analyze/tests/build, Fastify API typecheck/tests/build, and Next.js admin typecheck/build passed. External Firebase, Stripe, Cloudinary, Maps and store credentials remain outside GitHub." \
+            --prerelease
