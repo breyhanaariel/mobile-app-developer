@@ -38,9 +38,9 @@ I take on mobile app projects for independent professionals, entrepreneurs, and 
 | --- | ---: | --- |
 | **Hourly Support** | **$35/hour** | Troubleshooting, debugging, small repairs, configuration help, and undefined issues. |
 | **Feature Pack** | **from $75** | One small, clearly defined feature or improvement to an existing app. Larger features, major redesigns, integrations, and architectural changes are quoted separately. |
-| **Maintenance** | **$100/month** | Up to 3 small bug fixes per month with a standard 3-business-day turnaround after the files, access, information, and reproduction steps needed to begin are received. |
+| **Maintenance** | **$100/month** | Up to **3 small bug fixes + 1 small new feature per month**, with a standard 3-business-day turnaround after the files, access, information, and reproduction/details needed to begin are received. |
 
-Unused Maintenance fixes roll over while the plan remains active, up to a maximum balance of **6 fixes**. The standard turnaround applies to each qualifying fix rather than an accumulated backlog. Larger or urgent issues are quoted separately.
+Unused Maintenance allowances roll over while the plan remains active. **Bug fixes can accumulate up to a maximum balance of 6 fixes, and new features can accumulate up to a maximum balance of 6 features.** The standard turnaround applies to each qualifying fix or feature rather than an accumulated backlog. Larger, urgent, complex, redesign, integration, or architectural work is quoted separately.
 
 **Idea → UI/UX → Mobile App → Backend → Testing → Launch Preparation**
 
@@ -59,47 +59,57 @@ Unused Maintenance fixes roll over while the plan remains active, up to a maximu
 
 ## 🌷 Featured Work
 
-*These are independent concept projects based on realistic client briefs. They demonstrate how I approach real product and business problems; no paid client relationship or fictional business results are claimed.*
+*The showcase work is made up of independent concept projects based on realistic client briefs. No paid client relationship or fictional business results are claimed.*
 
-### 💅 Glossed Tip — Mobile Nail Booking & Business Management
+<table>
+<tr>
+<td width="280" valign="top"><img src="./assets/glossed-tip-cover.svg" alt="Glossed Tip mobile nail booking app preview" width="260"><br><br><a href="./glossed-tip/README.md">📖 Case Study</a></td>
+<td valign="top">
+<h3>💅 Glossed Tip — Mobile Nail Booking &amp; Business Management</h3>
+<p>Mobile Service Business | Booking, route-aware scheduling, deposits, client management</p>
+<p>A mobile nail technician concept designed to replace booking through DMs and disconnected scheduling/payment tools. Customers can browse nail sets, configure services, enter a service address, view travel-feasible availability, upload inspiration, calculate a deposit, and rebook previous services. A responsive technician dashboard supports day-to-day business operations.</p>
+<p><strong>Demonstrates:</strong> native Android development · booking logic · route-aware scheduling · service pricing · deposits · media selection · customer/business workflows</p>
+<p><strong>Build:</strong> Kotlin · Jetpack Compose · Firebase integration architecture · Google Places/Routes architecture · Stripe architecture · automated tests · GitHub Actions</p>
+<p><strong>Business goal:</strong> Make a mobile service business easier to book and operate without relying on manual scheduling across multiple disconnected tools.</p>
+<p><strong>Status:</strong> Demo Complete · production cloud/provider integration pending</p>
+<p><em>Independent concept project — no real client relationship or business results are claimed.</em></p>
+</td>
+</tr>
+</table>
 
-**Mobile Service Business | Booking, route-aware scheduling, deposits, client management**
+<table>
+<tr>
+<td width="280" valign="top"><img src="./assets/all-together-cover.svg" alt="AllTogether family event planning app preview" width="260"><br><br><a href="./all-together/README.md">📖 Case Study</a> · <a href="https://github.com/breyhanaariel/mobile-app-developer/releases/tag/all-together-v002">📱 Android Release</a></td>
+<td valign="top">
+<h3>👨‍👩‍👧‍👦 AllTogether — Family Event Planning Platform</h3>
+<p>Consumer App | Private events, Household RSVP, collaboration, reminders</p>
+<p>A family-event platform designed to bring reunions, birthdays, vacations, holidays, schedules, polls, tasks, shared expenses, photos, and event conversation into one private experience instead of scattered group texts and spreadsheets.</p>
+<p><strong>Signature feature:</strong> Household RSVP — one adult can manage attendance for an entire household, including children and guests who do not need accounts.</p>
+<p><strong>Demonstrates:</strong> cross-platform mobile development · relational data · multi-user collaboration · role-based authorization · invitations · accessibility · notifications · media moderation</p>
+<p><strong>Build:</strong> React Native · Expo · TypeScript · Fastify · Neon PostgreSQL · Drizzle · Clerk architecture · Cloudinary · Expo Push · Resend · Google Maps · CI/testing</p>
+<p><strong>Business goal:</strong> Reduce the coordination friction of multi-generational family events by putting the information and decisions everyone needs in one place.</p>
+<p><strong>Status:</strong> Code Complete · Live Neon Persistence · external provider setup pending</p>
+<p><em>Independent concept project — no real client relationship or business results are claimed.</em></p>
+</td>
+</tr>
+</table>
 
-A mobile nail technician concept designed to replace booking through DMs and disconnected scheduling/payment tools. Customers can browse nail sets, configure services, enter a service address, view travel-feasible availability, upload inspiration, calculate a deposit, and rebook previous services. A responsive technician dashboard supports appointments, clients, services, availability, waitlists, and business operations.
-
-**Demonstrates:** native Android development · booking logic · route-aware scheduling · service pricing · deposits · media selection · customer/business workflows  
-**Build:** Kotlin · Jetpack Compose · Firebase integration architecture · Google Places/Routes architecture · Stripe architecture · automated tests · GitHub Actions  
-**Business goal:** Make a mobile service business easier to book and operate without relying on manual scheduling across multiple disconnected tools.  
-**Status:** Demo Complete · production cloud/provider integration pending  
-**[📖 Case Study & Source](./glossed-tip/README.md)**
-
-### 👨‍👩‍👧‍👦 AllTogether — Family Event Planning Platform
-
-**Consumer App | Private events, Household RSVP, collaboration, reminders**
-
-A family-event platform designed to bring reunions, birthdays, vacations, holidays, schedules, polls, tasks, shared expenses, photos, and event conversation into one private experience instead of scattered group texts and spreadsheets.
-
-**Signature feature:** **Household RSVP** lets one adult manage attendance for an entire household, including children and guests who do not need accounts.
-
-**Demonstrates:** cross-platform mobile development · relational data · multi-user collaboration · role-based authorization · invitations · accessibility · notifications · media moderation  
-**Build:** React Native · Expo · TypeScript · Fastify · Neon PostgreSQL · Drizzle · Clerk architecture · Cloudinary · Expo Push · Resend · Google Maps · CI/testing  
-**Business goal:** Reduce the coordination friction of multi-generational family events by putting the information and decisions everyone needs in one place.  
-**Status:** Code Complete · Live Neon Persistence · external provider setup pending  
-**[📖 Case Study & Source](./all-together/README.md)** · **[📱 Android Release](https://github.com/breyhanaariel/mobile-app-developer/releases/tag/all-together-v002)**
-
-### 🌮 Bite Route — Food Truck Ordering, Location & Loyalty
-
-**Mobile Commerce | Location, ordering, payments, pickup tracking, loyalty**
-
-A food-truck app designed to help customers immediately find the truck, see current menu availability, customize and order food, choose pickup timing, track order status, and return through a loyalty program. A responsive Owner/Staff dashboard supports orders, menu availability, stops, wait times, promos, loyalty settings, and database-derived operational analytics.
-
-**Signature feature:** **Find the Truck** surfaces the current/next location, ordering state, pickup estimate, optional distance, and upcoming route immediately.
-
-**Demonstrates:** Flutter · mobile commerce · maps/location · modifier pricing · guest/account checkout · payment-state handling · capacity-aware pickup · loyalty · role-based operations  
-**Build:** Flutter · Riverpod · Fastify · TypeScript · Neon PostgreSQL · Drizzle · Firebase · Stripe sandbox · FCM · Cloudinary · Google Maps · Next.js · Tailwind CSS · CI/testing  
-**Business goal:** Give a mobile food business one branded customer experience for discovery, ordering, pickup, and repeat business while giving staff practical operational controls.  
-**Status:** Code Complete · Live Neon Persistence · external provider setup pending  
-**[📖 Case Study & Source](./bite-route/README.md)** · **[📱 Android Release](https://github.com/breyhanaariel/mobile-app-developer/releases/tag/bite-route-v001)**
+<table>
+<tr>
+<td width="280" valign="top"><img src="./assets/bite-route-cover.svg" alt="Bite Route food truck ordering app preview" width="260"><br><br><a href="./bite-route/README.md">📖 Case Study</a> · <a href="https://github.com/breyhanaariel/mobile-app-developer/releases/tag/bite-route-v001">📱 Android Release</a></td>
+<td valign="top">
+<h3>🌮 Bite Route — Food Truck Ordering, Location &amp; Loyalty</h3>
+<p>Mobile Commerce | Location, ordering, payments, pickup tracking, loyalty</p>
+<p>A food-truck app designed to help customers immediately find the truck, see current menu availability, customize and order food, choose pickup timing, track order status, and return through a loyalty program. A responsive Owner/Staff dashboard supports orders and business operations.</p>
+<p><strong>Signature feature:</strong> Find the Truck — current/next location, ordering state, pickup estimate, optional distance, and upcoming route are surfaced immediately.</p>
+<p><strong>Demonstrates:</strong> Flutter · mobile commerce · maps/location · modifier pricing · guest/account checkout · payment-state handling · capacity-aware pickup · loyalty · role-based operations</p>
+<p><strong>Build:</strong> Flutter · Riverpod · Fastify · TypeScript · Neon PostgreSQL · Drizzle · Firebase · Stripe sandbox · FCM · Cloudinary · Google Maps · Next.js · Tailwind CSS · CI/testing</p>
+<p><strong>Business goal:</strong> Give a mobile food business one branded customer experience for discovery, ordering, pickup, and repeat business while giving staff practical operational controls.</p>
+<p><strong>Status:</strong> Code Complete · Live Neon Persistence · external provider setup pending</p>
+<p><em>Independent concept project — no real client relationship or business results are claimed.</em></p>
+</td>
+</tr>
+</table>
 
 ---
 
