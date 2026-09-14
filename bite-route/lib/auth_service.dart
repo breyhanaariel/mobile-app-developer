@@ -24,7 +24,11 @@ class BiteRouteAuthService {
     return _auth.signInWithCredential(credential);
   }
 
-  Future<String?> apiToken() => _auth.currentUser?.getIdToken();
+  Future<String?> apiToken() async {
+    final user = _auth.currentUser;
+    return user == null ? null : await user.getIdToken();
+  }
+
   Future<void> signOut() async {
     try { await GoogleSignIn().signOut(); } catch (_) {}
     await _auth.signOut();
