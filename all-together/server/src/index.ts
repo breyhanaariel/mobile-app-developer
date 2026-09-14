@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { principalFromAuthorization, roleCanManageEvent } from './auth.js';
 import { databaseEnabled } from './db.js';
 import { createCloudinaryUploadSignature, destroyCloudinaryAsset, registerPushToken, savePhoto } from './engagement.js';
+import { runReminderSweep } from './reminders.js';
 import {
   acceptInvitation,
   createEvent,
@@ -258,6 +259,13 @@ app.get('/v1/events/:eventId/admin', async (request, reply) => {
   const membership = await getMembership(eventId, principal.userId);
   if (!membership || !roleCanManageEvent(membership.role)) return reply.code(403).send({ error: 'organizer_required' });
   return { event: await getEventBundle(eventId, principal.userId), management: true };
+});
+
+app.get('/v1/jobs/reminders', async (request, reply) => {
+  const expected = process.env.CRON_SECRET;
+  if (!expected) return reply.code(503).send({ error: 'cron_secret_missing' });
+  if (request.headers.authorization !== `Bearer ${expected}`) return reply.code(401).send({ error: 'invalid_cron_secret' });
+  return runReminderSweep();
 });
 
 const port = Number(process.env.PORT ?? 3000);
