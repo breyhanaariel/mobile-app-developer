@@ -4,7 +4,7 @@
 
 I design and build complete mobile applications for **small businesses, entrepreneurs, and custom product ideas**—from product strategy and UI/UX through development, backend systems, integrations, testing, and launch preparation.
 
-![Mobile Application Developer Portfolio Cover](./assets/portfolio-cover.svg)
+![Mobile Application Developer Portfolio Cover](./site/assets/portfolio-cover.svg)
 
 ---
 
@@ -18,7 +18,7 @@ I design and build complete mobile applications for **small businesses, entrepre
 
 I take on mobile app projects for independent professionals, entrepreneurs, and small businesses, including MVPs, scheduling apps, business apps, app redesigns, new features, bug fixes, backend/API integrations, payments/authentication, and owner/staff dashboards.
 
-[![Mobile App Services & Packages](./assets/services-packages-cover.svg)](https://breyhanaariel.github.io/mobile-app-developer/services.html)
+[![Mobile App Services & Packages](./site/assets/services-packages-cover.svg)](https://breyhanaariel.github.io/mobile-app-developer/services.html)
 
 🌷 **[View Services, Packages & Project Inquiry →](https://breyhanaariel.github.io/mobile-app-developer/services.html)**  
 💌 **[Send a Project Inquiry →](https://breyhanaariel.github.io/mobile-app-developer/services.html#inquiry)**  
