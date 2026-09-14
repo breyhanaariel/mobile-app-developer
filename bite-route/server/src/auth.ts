@@ -11,11 +11,11 @@ const demoTokens: Record<string, Principal> = {
   'demo-owner-token': { userId: '22222222-2222-4222-8222-222222222222', email: 'owner@biteroute.demo', role: 'owner' },
 };
 
-async function ensureFirebase() {
-  if (getApps().length) return;
+export async function ensureFirebaseAdmin() {
+  if (getApps().length) return getApps()[0];
   const projectId = process.env.FIREBASE_PROJECT_ID;
-  if (!projectId) return;
-  initializeApp({ projectId, credential: process.env.GOOGLE_APPLICATION_CREDENTIALS ? applicationDefault() : undefined });
+  if (!projectId) return null;
+  return initializeApp({ projectId, credential: process.env.GOOGLE_APPLICATION_CREDENTIALS ? applicationDefault() : undefined });
 }
 
 export async function principalFromAuthorization(header?: string): Promise<Principal | null> {
@@ -24,8 +24,9 @@ export async function principalFromAuthorization(header?: string): Promise<Princ
   if (demoTokens[token]) return demoTokens[token];
   if (!process.env.FIREBASE_PROJECT_ID || !db) return null;
   try {
-    await ensureFirebase();
-    const decoded = await getAuth().verifyIdToken(token);
+    const app = await ensureFirebaseAdmin();
+    if (!app) return null;
+    const decoded = await getAuth(app).verifyIdToken(token);
     const email = decoded.email;
     const [existing] = await db.select().from(users).where(eq(users.authSubject, decoded.uid)).limit(1);
     let user = existing;
