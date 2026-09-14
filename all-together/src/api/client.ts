@@ -34,8 +34,13 @@ export class AllTogetherApiClient {
     return this.request(`/v1/households/${encodeURIComponent(householdId)}/rsvp`, true, { method: 'POST', body: JSON.stringify({ status, attendance }) });
   }
 
+  async activityRsvp(scheduleItemId: string, status: 'yes' | 'no' | 'maybe' | 'pending') {
+    return this.request(`/v1/schedule-items/${encodeURIComponent(scheduleItemId)}/rsvp`, true, { method: 'POST', body: JSON.stringify({ status }) });
+  }
+
   async vote(pollId: string, optionIds: string[]) { return this.request(`/v1/polls/${encodeURIComponent(pollId)}/votes`, true, { method: 'POST', body: JSON.stringify({ optionIds }) }); }
   async postMessage(eventId: string, text: string) { return this.request('/v1/chat/messages', true, { method: 'POST', body: JSON.stringify({ eventId, text }) }); }
+  async removeMessage(messageId: string) { return this.request(`/v1/chat/messages/${encodeURIComponent(messageId)}`, true, { method: 'DELETE' }); }
   async setExpenseShareSettled(shareId: string, settled: boolean) { return this.request(`/v1/expense-shares/${encodeURIComponent(shareId)}`, true, { method: 'PATCH', body: JSON.stringify({ settled }) }); }
   async setTaskComplete(taskId: string, complete: boolean) { return this.request(`/v1/tasks/${encodeURIComponent(taskId)}`, true, { method: 'PATCH', body: JSON.stringify({ complete }) }); }
   async notifications<T = unknown>(): Promise<T> { return this.request('/v1/notifications', true); }
@@ -43,6 +48,7 @@ export class AllTogetherApiClient {
   async registerPushToken(token: string, platform: 'ios' | 'android') { return this.request('/v1/push-tokens', true, { method: 'POST', body: JSON.stringify({ token, platform }) }); }
   async cloudinarySignature(eventId: string): Promise<CloudinarySignature> { return this.request('/v1/photos/sign-upload', true, { method: 'POST', body: JSON.stringify({ eventId }) }); }
   async recordPhoto(eventId: string, publicId: string, secureUrl: string, caption?: string) { return this.request('/v1/photos', true, { method: 'POST', body: JSON.stringify({ eventId, publicId, secureUrl, caption }) }); }
+  async removePhoto(photoId: string) { return this.request(`/v1/photos/${encodeURIComponent(photoId)}`, true, { method: 'DELETE' }); }
 
   async uploadPhoto(eventId: string, uri: string, caption?: string) {
     const signature = await this.cloudinarySignature(eventId);
