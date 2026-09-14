@@ -1,62 +1,111 @@
 # AllTogether Completion Status
 
-## Portfolio/demo completion
+## Coding status
 
-AllTogether's repository implementation is complete enough to demonstrate the intended product architecture and customer-facing experience on Android, with iOS source/configuration maintained in the same Expo project.
+**Application coding is complete.**
 
-### Completed in repository
+All planned MVP product flows, persistence models, API endpoints, authorization rules, integration code, automated validation, and release automation are implemented in the repository. A real Neon PostgreSQL project is provisioned and seeded for the portfolio demo.
 
-- Expo + React Native + TypeScript mobile application
-- iOS + Android identifiers/configuration
+The items that remain are external provider credentials, first-time account configuration/deployment, and store signing. Those are deliberately kept outside GitHub and are not unfinished application code.
+
+## Completed mobile implementation
+
+- Expo + React Native + TypeScript application for iOS + Android
 - Home / Events / Create / Notifications / Profile navigation
 - Overview / Schedule / People / Polls / Expenses / Photos / Chat event experience
 - multi-generational accessibility requirements
-- seeded offline Carter Family Reunion 2027 demo
-- live Neon PostgreSQL project and seeded Carter reunion dataset
-- Drizzle relational schema
-- Fastify API and repository layer
-- multiple family groups
+- live API mode plus clearly labeled seeded offline Carter Family Reunion 2027 fallback
+- multiple family groups/events and event switching
 - private event creation
-- invite preview and authenticated acceptance
-- Organizer / Co-organizer / Family Member / Guest authorization
-- Household RSVP and individual household attendance data model
-- schedules and optional activity RSVP model
-- single/multiple polls and voting rules
-- expense split/share/settlement model without money movement
-- tasks
-- event-wide chat
-- Cloudinary signed-upload architecture
-- Expo push-token architecture
-- secondary email architecture
-- Google Maps handoff
-- Clerk integration boundary for Email/Google/Apple
-- Vercel-compatible short-poll collaboration strategy
-- automated domain tests
-- Android GitHub Actions release pipeline
-- architecture/setup/QA/case-study documentation
+- public invitation preview before authentication
+- authenticated join-by-code/acceptance flow
+- Organizer / Co-organizer / Family Member / Guest roles
+- Household RSVP
+- individual attendance for children/guests/household members
+- optional activity RSVP
+- single/multiple polls and persisted voting
+- expense shares and settlement without money movement
+- task completion
+- event-wide chat and organizer moderation
+- image picker/compression, captioning, Cloudinary upload, live album rendering, and media moderation
+- Google Maps handoff plus optional embedded Static Maps preview
+- Expo push-reminder permission/token registration
+- live notification center
+- short-poll near-real-time synchronization after writes and on an interval
 
-## External credentials / account actions still required for a live production-like demo
+## Completed backend implementation
 
-These are intentionally not stored in GitHub:
+- Fastify + TypeScript
+- Drizzle ORM
+- live Neon PostgreSQL database
+- relational schema for users, identities, family groups, events, memberships, invitations, households, people, schedules, activity RSVPs, polls/votes, expenses/shares, tasks, chat, photos, push tokens, and notifications
+- Clerk token verification and local user/identity mapping
+- role-based authorization
+- event list/create/read/admin access
+- invitation preview/acceptance rules
+- Household RSVP and person attendance
+- activity RSVP
+- poll voting and vote counts
+- expense settlement
+- task completion
+- chat posting/moderation
+- signed Cloudinary upload + stored media + remote delete
+- Expo Push delivery
+- Resend secondary email delivery
+- persisted notification records
+- secured reminder job for RSVP/activity/poll/task reminders
+- health/readiness endpoints
+- Vercel cron configuration
 
-- Clerk application credentials and Google/Apple provider configuration
-- Cloudinary credentials
-- Expo/EAS project ID and optional push access token
-- email provider credentials and verified sender/domain
-- optional restricted Google Maps API keys for richer embedded map previews
-- Apple Developer signing credentials for distributable iOS builds
-- permanent Android release signing credentials
+## Testing/release automation
 
-## Vercel
+CI validates:
 
-The API is prepared for Vercel with the project root set to `all-together/server`. The connected Vercel team was checked and currently contains no imported projects. The first project import/link therefore remains an explicit account-level deployment step rather than something the repository can truthfully mark as already deployed.
+- Expo package compatibility
+- mobile TypeScript
+- mobile domain tests
+- server TypeScript
+- server tests, including invitation and authorization behavior
+- server production build
+- iOS native-project generation
+- Android native-project generation
+- Android Gradle APK compilation
+- versioned artifact packaging
+- GitHub prerelease publication
 
-## Status label for portfolio
+A successful `all-together-v001.apk` prerelease has already been produced. Subsequent completed revisions automatically publish the next numbered prerelease after every gate succeeds.
 
-Until the external credentials and first Vercel project import are supplied, use:
+## Live infrastructure already completed
 
-**Demo Complete · Live Neon Persistence · External Integrations Pending**
+- Neon project: created
+- PostgreSQL schema: applied
+- Carter Family Reunion 2027 data: seeded
+- repository/API persistence code: implemented
 
-After those credentials are configured and end-to-end device QA passes, the label can be simplified to:
+## External account configuration still required
+
+These items require credentials or account authorization and are intentionally not committed:
+
+- Clerk application keys and Google/Apple provider setup
+- Cloudinary account credentials
+- Expo/EAS project ID and push credentials
+- Resend credentials and verified email sender/domain
+- optional restricted Google Maps key for embedded previews
+- first Vercel project import/link and environment variables
+- `CRON_SECRET` on the deployed API
+- Apple Developer signing/provisioning for distributable iOS builds
+- permanent Android release signing for store distribution
+
+## Vercel boundary
+
+The API source and `vercel.json` cron configuration are complete. The connected Vercel team currently has no imported project, and the available connector does not expose the initial project-import action. Importing `breyhanaariel/mobile-app-developer` with root `all-together/server` is therefore an account-level deployment step rather than missing code.
+
+## Portfolio status label
+
+Use:
+
+**Code Complete · Live Neon Persistence · External Provider Setup Pending**
+
+After the external provider credentials are added, the Vercel project is imported, and signed-device QA is completed, the deployment label may be simplified to:
 
 **Completed · Demo Ready**
