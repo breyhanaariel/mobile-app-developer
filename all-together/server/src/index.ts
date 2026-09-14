@@ -3,7 +3,7 @@ import cors from '@fastify/cors';
 import { z } from 'zod';
 import { principalFromAuthorization, roleCanManageEvent } from './auth.js';
 import { databaseEnabled } from './db.js';
-import { createCloudinaryUploadSignature, registerPushToken, savePhoto } from './engagement.js';
+import { createCloudinaryUploadSignature, destroyCloudinaryAsset, registerPushToken, savePhoto } from './engagement.js';
 import {
   acceptInvitation,
   createEvent,
@@ -13,6 +13,9 @@ import {
   listUserEvents,
   postMessage,
   previewInvitation,
+  removeMessage,
+  removePhoto,
+  setActivityRsvp,
   setExpenseShareSettled,
   setTaskComplete,
   updateHouseholdRsvp,
@@ -32,6 +35,7 @@ const eventCreateSchema = z.object({
   endsAt: z.coerce.date(),
 });
 const householdRsvpSchema = z.object({ status: z.enum(['yes','no','maybe','pending']), attendance: z.record(z.string().uuid(), z.boolean()).optional() });
+const activityRsvpSchema = z.object({ status: z.enum(['yes','no','maybe','pending']) });
 const messageSchema = z.object({ eventId: z.string().uuid(), text: z.string().min(1).max(2000) });
 const voteSchema = z.object({ optionIds: z.array(z.string().uuid()).max(20) });
 const settledSchema = z.object({ settled: z.boolean() });
@@ -114,6 +118,18 @@ app.post('/v1/households/:householdId/rsvp', async (request, reply) => {
   return { ok: true };
 });
 
+app.post('/v1/schedule-items/:scheduleItemId/rsvp', async (request, reply) => {
+  const principal = await requirePrincipal(request, reply); if (!principal) return;
+  const { scheduleItemId } = request.params as { scheduleItemId: string };
+  const parsed = activityRsvpSchema.safeParse(request.body);
+  if (!parsed.success) return reply.code(400).send({ error: parsed.error.flatten() });
+  const result = await setActivityRsvp(scheduleItemId, principal.userId, parsed.data.status);
+  if (result.kind === 'not_found') return reply.code(404).send({ error: 'schedule_item_not_found' });
+  if (result.kind === 'not_allowed') return reply.code(409).send({ error: 'activity_rsvp_not_enabled' });
+  if (result.kind === 'forbidden') return reply.code(403).send({ error: 'event_membership_required' });
+  return { ok: true };
+});
+
 app.post('/v1/chat/messages', async (request, reply) => {
   const principal = await requirePrincipal(request, reply); if (!principal) return;
   const parsed = messageSchema.safeParse(request.body);
@@ -121,6 +137,15 @@ app.post('/v1/chat/messages', async (request, reply) => {
   const result = await postMessage(parsed.data.eventId, principal.userId, parsed.data.text);
   if (result.kind === 'forbidden') return reply.code(403).send({ error: 'event_membership_required' });
   return reply.code(201).send(result.message);
+});
+
+app.delete('/v1/chat/messages/:messageId', async (request, reply) => {
+  const principal = await requirePrincipal(request, reply); if (!principal) return;
+  const { messageId } = request.params as { messageId: string };
+  const result = await removeMessage(messageId, principal.userId);
+  if (result.kind === 'not_found') return reply.code(404).send({ error: 'message_not_found' });
+  if (result.kind === 'forbidden') return reply.code(403).send({ error: 'message_remove_not_allowed' });
+  return { ok: true };
 });
 
 app.get('/v1/invitations/:code/preview', async (request, reply) => {
@@ -206,6 +231,16 @@ app.post('/v1/photos', async (request, reply) => {
   const result = await savePhoto({ ...parsed.data, userId: principal.userId });
   if (result.kind === 'forbidden') return reply.code(403).send({ error: 'event_membership_required' });
   return reply.code(201).send(result.photo);
+});
+
+app.delete('/v1/photos/:photoId', async (request, reply) => {
+  const principal = await requirePrincipal(request, reply); if (!principal) return;
+  const { photoId } = request.params as { photoId: string };
+  const result = await removePhoto(photoId, principal.userId);
+  if (result.kind === 'not_found') return reply.code(404).send({ error: 'photo_not_found' });
+  if (result.kind === 'forbidden') return reply.code(403).send({ error: 'photo_remove_not_allowed' });
+  const remote = await destroyCloudinaryAsset(result.cloudinaryPublicId);
+  return { ok: true, remote };
 });
 
 app.get('/v1/events/:eventId/changes', async (request, reply) => {
