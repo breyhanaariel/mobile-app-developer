@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
@@ -25,7 +26,6 @@ class CommerceSession {
       _guestKey = const Uuid().v4();
       await prefs.setString('bite_route_guest_key', _guestKey!);
     }
-
     try {
       await Firebase.initializeApp();
       firebaseReady = true;
@@ -34,7 +34,6 @@ class CommerceSession {
     } catch (_) {
       firebaseReady = false;
     }
-
     const stripeKey = String.fromEnvironment('STRIPE_PUBLISHABLE_KEY');
     if (stripeKey.isNotEmpty) {
       Stripe.publishableKey = stripeKey;
@@ -44,6 +43,10 @@ class CommerceSession {
   }
 
   Future<void> refreshAuthToken() async {
+    if (!firebaseReady) {
+      api.bearerToken = null;
+      return;
+    }
     api.bearerToken = await auth.apiToken();
   }
 
@@ -71,15 +74,16 @@ class CommerceSession {
     final payment = Map<String, dynamic>.from(result['payment'] as Map? ?? const {});
     final clientSecret = payment['clientSecret']?.toString();
     final order = Map<String, dynamic>.from(result['order'] as Map);
-
     if (stripeReady && clientSecret != null && clientSecret.isNotEmpty) {
-      await Stripe.instance.initPaymentSheet(paymentSheetParameters: SetupPaymentSheetParameters(
-        paymentIntentClientSecret: clientSecret,
-        merchantDisplayName: 'Bite Route',
-        style: ThemeMode.system,
-        applePay: const PaymentSheetApplePay(merchantCountryCode: 'US'),
-        googlePay: const PaymentSheetGooglePay(merchantCountryCode: 'US', testEnv: true),
-      ));
+      await Stripe.instance.initPaymentSheet(
+        paymentSheetParameters: SetupPaymentSheetParameters(
+          paymentIntentClientSecret: clientSecret,
+          merchantDisplayName: 'Bite Route',
+          style: ThemeMode.system,
+          applePay: const PaymentSheetApplePay(merchantCountryCode: 'US'),
+          googlePay: const PaymentSheetGooglePay(merchantCountryCode: 'US', testEnv: true),
+        ),
+      );
       await Stripe.instance.presentPaymentSheet();
       await api.confirmPayment(order['id'].toString(), guestKey: signedIn ? null : _guestKey);
     }
