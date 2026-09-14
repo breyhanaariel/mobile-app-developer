@@ -2,7 +2,7 @@
 
 > Complete mobile app solutions for small businesses, entrepreneurs, and custom product ideas.
 
-**Portfolio status:** Two flagship demos complete / Bite Route planned
+**Portfolio status:** Two flagship codebases complete / Bite Route planned
 
 This repository is the source for my freelance-first Mobile Application Developer portfolio. The portfolio demonstrates complete app delivery: product thinking, UI/UX, implementation, authentication, databases, notifications, payments and booking where appropriate, testing, and deployment.
 
@@ -43,19 +43,19 @@ The technician receives a dedicated responsive web admin dashboard demo for dail
 ### 02 — AllTogether
 
 **Family event planning platform**  
-**Status:** Demo Complete / Live Neon Persistence / External Integrations Pending
+**Status:** Code Complete / Live Neon Persistence / External Provider Setup Pending
 
 **Client scenario:** A family organizer wants one private place to coordinate reunions, birthdays, vacations, holidays, and other multi-generational family events instead of relying on group texts, spreadsheets, and scattered apps.
 
-AllTogether is event-centered rather than feed-centered. The completed portfolio demo includes private event creation, household-based RSVPs, multi-day schedules, single/multiple-choice polls, tasks, shared expense tracking and settlement, invitations, family/event roles, one event-wide chat, photo-upload architecture, notifications, and accessible multi-generational UX.
+AllTogether is event-centered rather than feed-centered. The completed codebase includes private event creation, public invite preview and authenticated join-by-code, multiple events, household and individual attendance RSVPs, activity RSVPs, polls, tasks, shared expense tracking/settlement, an event-wide moderated chat, a shared Cloudinary-ready photo album, push/email reminder delivery code, Google Maps preview/handoff, and accessible multi-generational UX.
 
 **Signature feature:** Household RSVP — one family member can manage attendance for an entire household, including children and guests who do not need accounts.
 
-The backend uses a real seeded Neon PostgreSQL database with a Fastify/Drizzle API. Clerk, Cloudinary, Expo Push, secondary email, optional embedded Google Maps credentials, and the initial Vercel project import remain external account configuration and are never falsely represented as active before credentials are supplied.
+The backend uses a real seeded Neon PostgreSQL database with a Fastify/Drizzle API. Clerk email/Google/Apple auth, Cloudinary media, Expo Push, Resend email, optional embedded Google Maps, and a secured Vercel cron reminder workflow are fully wired in code. Their actual provider credentials plus the first Vercel project import remain account-level configuration outside GitHub.
 
-**Technical focus:** iOS + Android • Expo/React Native • TypeScript • Fastify • Neon PostgreSQL • Drizzle ORM • Clerk architecture • Cloudinary architecture • Expo Push • Google Maps handoff • CI/testing
+**Technical focus:** iOS + Android • Expo/React Native • TypeScript • Fastify • Neon PostgreSQL • Drizzle ORM • Clerk • Cloudinary • Expo Push • Resend • Google Maps • scheduled reminders • CI/testing
 
-**Portfolio proof:** Cross-platform development, relational database design, role-based authorization, private invitations, multi-user collaboration, exact-cent expense logic, accessibility, media/notification integration architecture, automated tests, and native Android packaging.
+**Portfolio proof:** Cross-platform development, relational database design, role-based authorization, private invitations, multi-user collaboration, Household RSVP logic, exact-cent expense behavior, media moderation, notification delivery, accessibility, automated tests, iOS native-project validation, and Android release packaging.
 
 ### 03 — Bite Route
 
@@ -125,7 +125,7 @@ Only real technical measurements and actual outcomes are reported. No fictional 
 Projects are built one at a time and made genuinely functional before moving to the next:
 
 1. **Glossed Tip** — demo complete; live provider credentials/configuration pending
-2. **AllTogether** — demo complete; live Neon persistence; external provider configuration pending
+2. **AllTogether** — code complete; live Neon persistence; external provider/account configuration pending
 3. **Bite Route** — next flagship build
 
 Each application remains inside this repository. GitHub Actions workflows are scoped per app so changes to one project can build that project independently.
