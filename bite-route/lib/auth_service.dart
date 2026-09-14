@@ -3,8 +3,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class BiteRouteAuthService {
-  BiteRouteAuthService({FirebaseAuth? auth}) : _auth = auth ?? FirebaseAuth.instance;
-  final FirebaseAuth _auth;
+  FirebaseAuth get _auth => FirebaseAuth.instance;
 
   Stream<User?> get authStateChanges => _auth.authStateChanges();
   User? get currentUser => _auth.currentUser;
@@ -26,5 +25,8 @@ class BiteRouteAuthService {
   }
 
   Future<String?> apiToken() => _auth.currentUser?.getIdToken();
-  Future<void> signOut() async { await GoogleSignIn().signOut(); await _auth.signOut(); }
+  Future<void> signOut() async {
+    try { await GoogleSignIn().signOut(); } catch (_) {}
+    await _auth.signOut();
+  }
 }
