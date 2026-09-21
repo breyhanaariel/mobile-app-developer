@@ -14,7 +14,7 @@ I design and build complete mobile applications for **small businesses, entrepre
 
 💌 **Available For Freelance** [![Email](https://img.shields.io/badge/Email-D14836?style=flat-square&logo=gmail&logoColor=white)](mailto:breyhanadickenson@gmail.com?subject=Mobile%20App%20Project%20Inquiry)
 
-📱 **[View Live Portfolio](https://breyhanaariel.github.io/mobile-app-developer/)**
+📱 **[View Portfolio Microsite](https://breyhanaariel.github.io/mobile-app-developer/)**
 
 I take on mobile app projects for independent professionals, entrepreneurs, and small businesses, including MVPs, scheduling apps, business apps, app redesigns, new features, bug fixes, backend/API integrations, payments/authentication, and owner/staff dashboards.
 
@@ -126,9 +126,9 @@ External credentials, provider accounts, production signing keys, and store appr
 
 My portfolio is intentionally separated by specialty so each discipline can tell a focused story while still showing how my design and development skills connect.
 
-- 🎀 [UI/UX Designer](https://github.com/breyhanaariel/ui-ux-designer) — product design, research, flows, design systems, prototyping, and developer handoff
-- 💻 [Front-End Developer](https://github.com/breyhanaariel/front-end-developer) — React, Next.js, TypeScript, APIs, state management, testing, accessibility, and measured performance
-- 🌐 [Web Designer](https://github.com/breyhanaariel/web-designer) — responsive websites, redesigns, e-commerce, SEO/accessibility fundamentals, and business-focused client work
-- 🎨 [Graphic Designer](https://github.com/breyhanaariel/graphic-designer) — brand identity, campaign design, marketing assets, print, illustration, presentations, and motion
+- 🎀 [UI/UX Designer](https://breyhanaariel.github.io/ui-ux-designer/) — product design, research, flows, design systems, prototyping, and developer handoff
+- 💻 [Front-End Developer](https://breyhanaariel.github.io/front-end-developer/) — React, Next.js, TypeScript, APIs, state management, testing, accessibility, and measured performance
+- 🌐 [Web Designer](https://breyhanaariel.github.io/web-designer/) — responsive websites, redesigns, e-commerce, SEO/accessibility fundamentals, and business-focused client work
+- 🎨 [Graphic Designer](https://breyhanaariel.github.io/graphic-designer/) — brand identity, campaign design, marketing assets, print, illustration, presentations, and motion
 - 📱 **Mobile Application Developer** — iOS + Android apps, UI/UX, backend systems, integrations, testing, and launch preparation
-- 🤖 [AI Automation Specialist](https://github.com/breyhanaariel/ai-automation-specialist) — AI-powered workflows, agents, APIs, integrations, automation, and human-in-the-loop systems
+- 🤖 [AI Automation Specialist](https://breyhanaariel.github.io/ai-automation-specialist/) — AI-powered workflows, agents, APIs, integrations, automation, and human-in-the-loop systems
