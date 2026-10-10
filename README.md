@@ -1,6 +1,6 @@
 # 🎀 Brianna Dickenson 🎀
 
-## **Mobile Application Developer | iOS · Android · Cross-Platform Apps**
+## Mobile Application Developer · iOS Development · Android Development
 
 I design and build complete mobile applications for **small businesses, entrepreneurs, and custom product ideas**—from product strategy and UI/UX through development, backend systems, integrations, testing, and launch preparation.
 
@@ -8,25 +8,19 @@ I design and build complete mobile applications for **small businesses, entrepre
 
 ---
 
-## 💌 Work With Me
+## 💌 Hire Me
 
-💻 **Seeking Full Time Remote Position**  [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=flat-square&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/brianna-dickenson-9555515b)
+🕓 **Seeking Full-Time Remote Position** · 💌 **Available for Freelance**
 
-💌 **Available For Freelance** [![Email](https://img.shields.io/badge/Email-D14836?style=flat-square&logo=gmail&logoColor=white)](mailto:breyhanadickenson@gmail.com?subject=Mobile%20App%20Project%20Inquiry)
+🌐 **[View Live Portfolio](https://breyhanaariel.github.io/mobile-app-developer/)** · 💌 **[Hire Me / Project Inquiry](https://breyhanaariel.github.io/mobile-app-developer/#contact)**
 
-📱 **[View Portfolio Microsite](https://breyhanaariel.github.io/mobile-app-developer/)**
+💼 [LinkedIn](https://www.linkedin.com/in/brianna-dickenson-9555515b) · [Email](mailto:breyhanadickenson@gmail.com?subject=Mobile%20Application%20Developer%20Inquiry)
 
 I take on mobile app projects for independent professionals, entrepreneurs, and small businesses, including MVPs, scheduling apps, business apps, app redesigns, new features, bug fixes, backend/API integrations, payments/authentication, and owner/staff dashboards.
 
-[![Mobile App Services & Packages](./site/assets/services-packages-cover.svg)](https://breyhanaariel.github.io/mobile-app-developer/services.html)
-
-🌷 **[View Services, Packages & Project Inquiry →](https://breyhanaariel.github.io/mobile-app-developer/services.html)**  
-💌 **[Send a Project Inquiry →](https://breyhanaariel.github.io/mobile-app-developer/services.html#inquiry)**  
-Prefer email? [breyhanadickenson@gmail.com](mailto:breyhanadickenson@gmail.com?subject=Mobile%20App%20Project%20Inquiry)
-
 ---
 
-## 🧠 Core Stack
+## 🧠 Skills & Technologies
 
 **Mobile:** Kotlin · Jetpack Compose · Flutter · Riverpod · React Native · Expo · iOS + Android cross-platform development  
 **Backend:** TypeScript · Fastify · REST APIs · server-side business logic  
@@ -93,7 +87,9 @@ Prefer email? [breyhanadickenson@gmail.com](mailto:breyhanadickenson@gmail.com?s
 
 ---
 
-## 📱 Mobile App Development Quality
+## ✅ Quality & Evidence
+
+### Mobile App Development Quality
 
 | Project | Product Evidence | Backend / Integration Evidence | Production Evidence |
 | --- | --- | --- | --- |
@@ -101,9 +97,7 @@ Prefer email? [breyhanadickenson@gmail.com](mailto:breyhanadickenson@gmail.com?s
 | [AllTogether](./all-together/README.md) | Events · Household RSVP · polls · tasks · expenses · chat · photos | Live Neon · Fastify/Drizzle · Clerk/Cloudinary/notification integrations in code | Automated tests · iOS project validation · Android release · CI |
 | [Bite Route](./bite-route/README.md) | Ordering · maps · pickup tracking · loyalty · owner/staff operations | Live Neon · Stripe/Firebase/Cloudinary integrations in code · Fastify/Drizzle API | Flutter/API tests · admin build · iOS/Android generation · Android release · CI |
 
----
-
-## ✅ Production Quality
+### Production Quality
 
 These projects are built as working application codebases rather than interface-only mockups. Across the portfolio I demonstrate application state and business rules, backend/API architecture, database design, authentication patterns, third-party integrations, automated tests, CI, Android packaging, and iOS-ready source where appropriate.
 
@@ -122,13 +116,21 @@ External credentials, provider accounts, production signing keys, and store appr
 
 ---
 
-## 🌸 Explore My Work
+## 🛠 Repository & Documentation
 
-My portfolio is intentionally separated by specialty so each discipline can tell a focused story while still showing how my design and development skills connect.
+Explore the project-specific folders and case studies linked in **Featured Work** for detailed design decisions, implementation notes, assets, and project status.
 
-- 🎀 [UI/UX Designer](https://breyhanaariel.github.io/ui-ux-designer/) — product design, research, flows, design systems, prototyping, and developer handoff
-- 💻 [Front-End Developer](https://breyhanaariel.github.io/front-end-developer/) — React, Next.js, TypeScript, APIs, state management, testing, accessibility, and measured performance
-- 🌐 [Web Designer](https://breyhanaariel.github.io/web-designer/) — responsive websites, redesigns, e-commerce, SEO/accessibility fundamentals, and business-focused client work
-- 🎨 [Graphic Designer](https://breyhanaariel.github.io/graphic-designer/) — brand identity, campaign design, marketing assets, print, illustration, presentations, and motion
-- 📱 **Mobile Application Developer** — iOS + Android apps, UI/UX, backend systems, integrations, testing, and launch preparation
-- 🤖 [AI Automation Specialist](https://breyhanaariel.github.io/ai-automation-specialist/) — AI-powered workflows, agents, APIs, integrations, automation, and human-in-the-loop systems
+The portfolio microsite lives in [`site/`](./site/).
+
+---
+
+## 🌸 Portfolio Family
+
+My portfolios are organized by specialty. Explore the live microsites below:
+
+- 💻 [Front-End Developer](https://breyhanaariel.github.io/front-end-developer/)
+- 🎀 [UI/UX Designer](https://breyhanaariel.github.io/ui-ux-designer/)
+- 🌐 [Web Designer](https://breyhanaariel.github.io/web-designer/)
+- 🎨 [Graphic Designer](https://breyhanaariel.github.io/graphic-designer/)
+- 📱 **Mobile Application Developer (current portfolio)**
+- 🤖 [AI Automation Specialist](https://breyhanaariel.github.io/ai-automation-specialist/)
