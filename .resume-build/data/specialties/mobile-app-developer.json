@@ -1,0 +1,20 @@
+{
+  "title": "Mobile Application Developer",
+  "accent": "#7D8DCA",
+  "summary": "Mobile developer creating Android and cross-platform app experiences with Kotlin, Flutter and React Native, emphasizing workflows, interfaces and backend integration.",
+  "skills": "Kotlin · Jetpack Compose · Flutter · Dart · Riverpod · React Native · Expo · TypeScript · PostgreSQL · Firebase",
+  "experience": [
+    "Built responsive web interfaces and supported debugging and quality assurance.",
+    "Applied reusable interface development and usability principles."
+  ],
+  "projects": [
+    {
+      "name": "Glossed Tip — Android Booking Demo",
+      "details": "Built a Kotlin/Jetpack Compose booking demo with service selection and pricing; cloud, routing and payment provider integration pending."
+    },
+    {
+      "name": "Bite Route — Flutter Food Truck App",
+      "details": "Developed Flutter commerce workflows for food truck discovery, ordering, pickup and loyalty; external provider setup pending."
+    }
+  ]
+}
